@@ -1,4 +1,4 @@
-# python_games
+# Python Games
 Simple games made with Python
 
 ## Pong
