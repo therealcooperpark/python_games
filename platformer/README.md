@@ -9,7 +9,7 @@
 4. Remove earned points for touching a platform underneath the player
 
 5. Add power ups feature
-	Wings - Saves you from a fall and places you on the lowest platform on screen
+	- Wings - Saves you from a fall and places you on the lowest platform on screen
 
 6. Update the background screen of the game
 
