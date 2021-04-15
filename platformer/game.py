@@ -25,6 +25,7 @@ class Player(pygame.sprite.Sprite):
         self.moving = False       # Track if player in movement
         self.jumping = False      # Track if player is jumping
         self.score = 0            # Track player score
+        self.image = ''           # Store image for character sprite
 
     def jump(self):
         '''
@@ -92,7 +93,7 @@ class Platform(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.surf = pygame.Surface((random.randint(50,100), 12)) # Surface dimensions
-        self.surf.fill((255,0,0))
+        self.surf.fill((252,173,3))
         self.rect = self.surf.get_rect(center = (random.randint(0,WIDTH-10),
                                                  random.randint(0,HEIGHT-30)))# Spawn point
         self.point = True
@@ -200,6 +201,7 @@ HARD   = 6     # Max number of platforms
 
 FramePerSec = pygame.time.Clock()
 
+bg = pygame.image.load('bg.png')
 displaysurface = pygame.display.set_mode((WIDTH,HEIGHT))
 pygame.display.set_caption('Platformer')
 
@@ -230,6 +232,7 @@ def game_start_settings():
 
     # Setup player
     P1  = Player()
+    P1.image = pygame.image.load('player.png')
     all_sprites.add(P1)
 
 
@@ -361,14 +364,18 @@ while True:
     
     plat_gen() # Generate new platforms
 
-    displaysurface.fill((0,0,0)) # Fill background with black
+    #displaysurface.fill((0,0,0)) # Fill background with black
+    displaysurface.blit(bg, (0,0))
     f = pygame.font.SysFont("Verdana", 20)
     g = f.render(str(P1.score), True, (123,255,0))
     displaysurface.blit(g, (WIDTH/2, 10))
 
     # Draw in all sprites with new positions (Group does this in a single command)
     for entity in all_sprites:
-        displaysurface.blit(entity.surf, entity.rect)
+        if entity == P1:
+            displaysurface.blit(entity.image, entity.rect)
+        else:
+            displaysurface.blit(entity.surf, entity.rect)
         entity.move()
 
     pygame.display.update() # Push changes to the screen
