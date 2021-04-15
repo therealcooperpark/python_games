@@ -144,6 +144,47 @@ def check(platform, groupies, dist):
                 return True
         return False
 
+
+def home_screen():
+    '''
+    Home screen on initial bootup or game over
+    '''
+    # Create fonts
+    title_font = pygame.font.SysFont('Verdana', 40)
+    button_font = pygame.font.SysFont('Verdana', 20)
+    
+    # Make title
+    title = title_font.render('Splatformer!', True, ((0,0,255)))
+    title_rect = title.get_rect(center=(WIDTH/2, 40))
+    
+    # Make buttons
+    play = button_font.render('Play', True, ((0,255,0)))
+    play_rect = play.get_rect(center=(WIDTH/2, HEIGHT/2))
+    quit = button_font.render('Quit', True, ((0,255,0)))
+    quit_rect = quit.get_rect(center=(WIDTH/2, HEIGHT/2 + 80))
+
+
+    # Set display background and button text
+    displaysurface.fill((255,255,255))
+    displaysurface.blit(title, title_rect)
+    play_button = displaysurface.blit(play, play_rect)
+    quit_button = displaysurface.blit(quit, quit_rect)
+    
+    while True:
+        # Log clicks
+        for event in pygame.event.get():
+            if event.type == MOUSEBUTTONDOWN and event.button == 1:
+                print('Registered the click!')
+                if play_button.collidepoint(event.pos):
+                    print('Made it here!')
+                    return None 
+                if quit_button.collidepoint(event.pos):
+                    sys.exit()
+
+
+        # Update state of game
+        pygame.display.update()
+
 '''
 Pregame settings
 '''
@@ -162,36 +203,129 @@ FramePerSec = pygame.time.Clock()
 displaysurface = pygame.display.set_mode((WIDTH,HEIGHT))
 pygame.display.set_caption('Platformer')
 
-'''
-Create player, platforms, and groups
-'''
-PT1 = Platform()
-PT1.surf = pygame.Surface((WIDTH, 20))
-PT1.surf.fill((255,0,0))
-PT1.rect = PT1.surf.get_rect(center = (WIDTH/2, HEIGHT-10))
-PT1.moving = False
-PT1.point = False
 
-P1  = Player()
+def game_start_settings():
+    '''
+    Setup game start settings
+    '''
+    
+    global PT1
+    global P1
+    global platforms
+    global all_sprites
 
-platforms = pygame.sprite.Group() # Stores platforms only
-platforms.add(PT1)
+    # Setup base platform
+    PT1 = Platform()
+    PT1.surf = pygame.Surface((WIDTH, 20))
+    PT1.surf.fill((255,0,0))
+    PT1.rect = PT1.surf.get_rect(center = (WIDTH/2, HEIGHT-10))
+    PT1.moving = False
+    PT1.point = False
 
-all_sprites = pygame.sprite.Group() # Store sprites in a group to manage asthetics?
-all_sprites.add(PT1)
-all_sprites.add(P1)
+    platforms = pygame.sprite.Group() # Stores platforms only
+    platforms.add(PT1)
 
-'''
-Generate the first 5-6 random platforms for the game
-'''
-for x in range(random.randint(4, 5)):
-    C = True
-    p1 = Platform()
-    while C:
+    all_sprites = pygame.sprite.Group() # Store sprites in a group to manage asthetics?
+    all_sprites.add(PT1)
+
+    # Setup player
+    P1  = Player()
+    all_sprites.add(P1)
+
+
+    # Generate the first 5-6 random platforms for the game
+    for x in range(random.randint(4, 5)):
+        C = True
         p1 = Platform()
-        C = check(p1, platforms, 0)
-    platforms.add(p1)
-    all_sprites.add(p1)
+        while C:
+            p1 = Platform()
+            C = check(p1, platforms, 0)
+        platforms.add(p1)
+        all_sprites.add(p1)
+
+
+def game_over():
+    '''
+    Wrap the game up
+    '''
+
+    # Kill the current game instance
+    for entity in all_sprites:
+        entity.kill()
+    time.sleep(1)
+    displaysurface.fill((255,0,0))
+    game_over = f.render('GAME OVER', True, (255,255,255))
+    game_over_rect = game_over.get_rect(center=(WIDTH/2, HEIGHT + 80))
+    displaysurface.blit(game_over, game_over_rect)
+    pygame.display.update()
+    time.sleep(1)
+    
+    # Update leaderboard
+    with open('leaderboard.txt', 'r') as leaderboard:
+        scores = [line.strip().split() for line in leaderboard]
+
+    # Update scores list with player score
+    if P1.score > int(scores[-1][1]):
+        name = leaderboard_name()
+        player_score_logged = False
+        new_scores = []
+        for idx in range(len(scores)):
+            score = int(scores[idx][1])
+            if P1.score > score and not player_score_logged:
+                scores.insert(idx, [name, str(P1.score)])
+                player_score_logged = True
+        else:
+            scores.append([name, str(P1.score)])
+
+    # Write out new leaderboard
+    with open('leaderboard.txt', 'w') as outfile:
+        for idx in range(10):
+            outfile.write('\t'.join(scores[idx]))
+            if idx < 9:
+                outfile.write('\n')
+
+    # Head to home screen and wait for new game to start 
+    home_screen()
+    game_start_settings()
+
+
+def leaderboard_name():
+    '''
+    Get a name for the leaderboard
+    '''
+
+    # Set leaderboard rect
+    leaderboard = f.render('Name:', True, (255,255,255))
+    leaderboard_rect = leaderboard.get_rect(center=(WIDTH/2 - 80, HEIGHT/2))
+
+    # Set input rect
+    name = ''
+    while True:
+        for event in pygame.event.get():
+            if event.type == KEYDOWN:
+                if event.unicode.isalpha():
+                    name += event.unicode
+                elif event.key == K_BACKSPACE:
+                    if len(name) == 0:
+                        continue
+                    else:
+                        name = name[:-1]
+                elif event.key == K_RETURN:
+                    if name == '':
+                        return 'FakeName'
+                    else:
+                        return name
+
+        displaysurface.fill((255,0,0))
+        name_box = f.render(name, True, (255,255,255))
+        name_rect = name_box.get_rect(center=(WIDTH/2, HEIGHT/2))
+        displaysurface.blit(leaderboard, leaderboard_rect)
+        displaysurface.blit(name_box, name_rect)
+        pygame.display.flip()
+
+# Bootup home screen
+home_screen()
+game_start_settings()
 
 '''
 Game Loop
@@ -214,33 +348,8 @@ while True:
 
     # Initiate "Game Over" shutdown
     if P1.rect.top > HEIGHT:
-        with open('leaderboard.txt', 'r') as leaderboard:
-            scores = [line.strip().split() for line in leaderboard]
-        with open('leaderboard.txt', 'w') as leaderboard:
-            score_count = 0
-            player_score_logged = False
-            for score in scores:
-                if score_count > 10 or len(score) == 1:
-                    break
-                if P1.score > int(score[1]) and not player_score_logged:
-                    player_score_logged = True
-                    name = input('Enter name: ')
-                    leaderboard.write('{0}\t{1}\n'.format(name, str(P1.score)))
-                    score_count += 1
-                leaderboard.write('\t'.join(score) + '\n')
-                score_count += 1
-
-
-
-        for entity in all_sprites:
-            entity.kill()
-            time.sleep(1)
-            displaysurface.fill((255,0,0))
-            pygame.display.update()
-            time.sleep(1)
-            pygame.quit()
-            sys.exit()
-
+        game_over()
+        continue
 
     # Update infinite scrolling screen
     if P1.rect.top <= HEIGHT / 3:
