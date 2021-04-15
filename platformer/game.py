@@ -80,9 +80,8 @@ class Player(pygame.sprite.Sprite):
                     self.pos.y = hits[0].rect.top + 1
                     self.vel.y = 0
                     self.jumping = False
-                    ## Trying to keep the piece moving with the platform. Almost works
-                    # if hits[0].moving == True:
-                    #    self.vel.x = hits[0].speed + 1
+                    if hits[0].moving == True:
+                        self.vel.x = hits[0].speed 
 
 
 
@@ -115,18 +114,20 @@ def plat_gen():
         width = random.randrange(50,100)
         p = Platform()
         C = True
+        dist = 0 # Allow the criteria for distance between platforms to shrink
 
         while C:
             p = Platform()
             p.rect.center = (random.randrange(0, WIDTH - width),
                              random.randrange(-50, 0))
-            C = check(p, platforms)
+            C = check(p, platforms, dist)
+            dist += 1
 
         platforms.add(p)
         all_sprites.add(p)
 
 
-def check(platform, groupies):
+def check(platform, groupies, dist):
     '''
     Check for proper spacing between platforms
     '''
@@ -136,7 +137,7 @@ def check(platform, groupies):
         for entity in groupies:
             if entity == platform:
                 continue
-            if (abs(platform.rect.top - entity.rect.bottom) < 50) and (abs(platform.rect.bottom - entity.rect.top) < 50):
+            if (abs(platform.rect.top - entity.rect.bottom) < 50 - dist) and (abs(platform.rect.bottom - entity.rect.top) < 50 - dist):
                 return True
         return False
 
@@ -185,7 +186,7 @@ for x in range(random.randint(4, 5)):
     p1 = Platform()
     while C:
         p1 = Platform()
-        C = check(p1, platforms)
+        C = check(p1, platforms, 0)
     platforms.add(p1)
     all_sprites.add(p1)
 
