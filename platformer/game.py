@@ -161,15 +161,12 @@ def home_screen():
     # Make buttons
     play = button_font.render('Play', True, ((0,255,0)))
     play_rect = play.get_rect(center=(WIDTH/2, HEIGHT/2))
+    leaderboard = button_font.render('Leaderboard', True, ((0,255,0)))
+    leaderboard_rect = leaderboard.get_rect(center=(WIDTH/2, HEIGHT/2 + 40))
     quit = button_font.render('Quit', True, ((0,255,0)))
     quit_rect = quit.get_rect(center=(WIDTH/2, HEIGHT/2 + 80))
 
 
-    # Set display background and button text
-    displaysurface.fill((255,255,255))
-    displaysurface.blit(title, title_rect)
-    play_button = displaysurface.blit(play, play_rect)
-    quit_button = displaysurface.blit(quit, quit_rect)
     
     while True:
         # Log clicks
@@ -179,12 +176,56 @@ def home_screen():
                 if play_button.collidepoint(event.pos):
                     print('Made it here!')
                     return None 
+                if leaderboard_button.collidepoint(event.pos):
+                    show_leaderboard()
                 if quit_button.collidepoint(event.pos):
                     sys.exit()
 
+        # Set display background and button text
+        displaysurface.fill((255,255,255))
+        displaysurface.blit(title, title_rect)
+        play_button = displaysurface.blit(play, play_rect)
+        leaderboard_button = displaysurface.blit(leaderboard, leaderboard_rect)
+        quit_button = displaysurface.blit(quit, quit_rect)
 
         # Update state of game
         pygame.display.update()
+
+
+def show_leaderboard():
+    '''
+    Show leaderboard screen
+    '''
+
+    # Create font
+    title_font = pygame.font.SysFont('Verdana', 40)
+    text_font = pygame.font.SysFont('Verdana', 15)
+
+    # Make title
+    title = title_font.render('LEADERBOARD', True, (255,255,255))
+    title_rect = title.get_rect(center=(WIDTH/2, 40))
+
+    # Make leaderboard
+    with open('leaderboard.txt', 'r') as infile:
+        scores = []
+        for idx, line in enumerate(infile):
+            score = text_font.render('    '.join(line.strip().split()), True, (255,255,255))
+            score_rect = score.get_rect(center=(WIDTH/2, 100+(30*idx)))
+            scores.append([score, score_rect])
+
+    # Write to screen
+    displaysurface.fill((0,0,0))
+    displaysurface.blit(title, title_rect)
+    for score in scores:
+        displaysurface.blit(score[0], score[1])
+    pygame.display.update()
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == MOUSEBUTTONDOWN and event.button == 1:
+                return None
+
+    
 
 '''
 Pregame settings
@@ -306,7 +347,7 @@ def leaderboard_name():
     while True:
         for event in pygame.event.get():
             if event.type == KEYDOWN:
-                if event.unicode.isalpha():
+                if event.unicode.isalpha() and len(name) < 4:
                     name += event.unicode
                 elif event.key == K_BACKSPACE:
                     if len(name) == 0:
@@ -315,7 +356,7 @@ def leaderboard_name():
                         name = name[:-1]
                 elif event.key == K_RETURN:
                     if name == '':
-                        return 'FakeName'
+                        return 'None'
                     else:
                         return name
 
