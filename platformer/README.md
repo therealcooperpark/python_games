@@ -1,6 +1,6 @@
 # Updates to be made for the game
 
-1. Fix the horizontal velocity of the player to the platform they're on
+~~1. Fix the horizontal velocity of the player to the platform they're on~~ **Completed**
 
 2. Update the colors and graphics of player & platforms
 
