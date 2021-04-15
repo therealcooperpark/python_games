@@ -22,8 +22,9 @@ class Player(pygame.sprite.Sprite):
         self.pos = vec((10, 360)) # Starting position
         self.vel = vec(0,0)       # Starting velocity
         self.acc = vec(0,0)       # Starting acceleration
-        self.jumping = False
-        self.score = 0
+        self.moving = False       # Track if player in movement
+        self.jumping = False      # Track if player is jumping
+        self.score = 0            # Track player score
 
     def jump(self):
         '''
@@ -51,8 +52,10 @@ class Player(pygame.sprite.Sprite):
         pressed_keys = pygame.key.get_pressed() # Log key stroke
         if pressed_keys[K_LEFT]:
             self.acc.x = -ACC
+            self.moving = True
         if pressed_keys[K_RIGHT]:
             self.acc.x = ACC
+            self.moving = True
 
         # Update parameters for character
         self.acc.x += self.vel.x * FRIC
@@ -80,8 +83,8 @@ class Player(pygame.sprite.Sprite):
                     self.pos.y = hits[0].rect.top + 1
                     self.vel.y = 0
                     self.jumping = False
-                    if hits[0].moving == True:
-                        self.vel.x = hits[0].speed 
+                    if hits[0].moving and not self.moving:
+                        self.pos.x += hits[0].speed 
 
 
 
@@ -137,7 +140,7 @@ def check(platform, groupies, dist):
         for entity in groupies:
             if entity == platform:
                 continue
-            if (abs(platform.rect.top - entity.rect.bottom) < 50 - dist) and (abs(platform.rect.bottom - entity.rect.top) < 50 - dist):
+            if abs(platform.rect.bottom - entity.rect.top) < 45 - (dist / 5):
                 return True
         return False
 
@@ -150,7 +153,7 @@ vec = pygame.math.Vector2 # 2 for two dimensional game
 HEIGHT = 450   # Game screen height
 WIDTH  = 400   # Game screen width
 ACC    = 0.5   # Acceleration?
-FRIC   = -0.12 # Friction?
+FRIC   = -0.16 # Friction?
 FPS    = 60    # Frames per second
 HARD   = 6     # Max number of platforms
 
@@ -206,9 +209,29 @@ while True:
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_SPACE:
                 P1.cancel_jump()
+            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                P1.moving = False
 
     # Initiate "Game Over" shutdown
     if P1.rect.top > HEIGHT:
+        with open('leaderboard.txt', 'r') as leaderboard:
+            scores = [line.strip().split() for line in leaderboard]
+        with open('leaderboard.txt', 'w') as leaderboard:
+            score_count = 0
+            player_score_logged = False
+            for score in scores:
+                if score_count > 10 or len(score) == 1:
+                    break
+                if P1.score > int(score[1]) and not player_score_logged:
+                    player_score_logged = True
+                    name = input('Enter name: ')
+                    leaderboard.write('{0}\t{1}\n'.format(name, str(P1.score)))
+                    score_count += 1
+                leaderboard.write('\t'.join(score) + '\n')
+                score_count += 1
+
+
+
         for entity in all_sprites:
             entity.kill()
             time.sleep(1)
