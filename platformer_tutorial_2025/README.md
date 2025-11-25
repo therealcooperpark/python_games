@@ -7,3 +7,4 @@ Introduction -- COMPLETE
 Installing Pygame -- COMPLETE
 Creating a Window -- COMPLETE
 Images, Input & Collisions -- IN PROGRESS
+Player, Tiles & Physics -- TO DO
