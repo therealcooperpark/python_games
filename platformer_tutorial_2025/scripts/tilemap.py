@@ -30,13 +30,18 @@ class Tilemap:
                 rects.append(pygame.Rect(tile['pos'][0] * self.tile_size, tile['pos'][1] * self.tile_size, self.tile_size, self.tile_size)) # A single-tile sized rect
         return rects
 
-    def render(self, surf):
+    def render(self, surf, offset=(0, 0)):
         for tile in self.offgrid_tiles: # Rendered first so tilemap takes precedence
             # Tiles off grid have their position tracked by pixels, not tiles. So no need to multiply here
-            surf.blit(self.game.assets[tile['type']][tile['variant']], tile['pos'])
+            surf.blit(self.game.assets[tile['type']][tile['variant']], (tile['pos'][0] - offset[0], tile['pos'][1] - offset[1]))
 
-        for loc in self.tilemap:
-            tile = self.tilemap[loc]
-                # For the first argument - the type points to the assets, the variant says which file number we should be using. In this case we're using all 1.png files from the asset type
-                # The second argument multiplies position by tile_size so the coordinates translate properly to the pixel distance on the screen
-            surf.blit(self.game.assets[tile['type']][tile['variant']], (tile['pos'][0] * self.tile_size, tile['pos'][1] * self.tile_size)) 
+
+        # Render only the tiles that could reasonably appear on the display by calculating number of tiles between camera position (top-left of display) and the bottom-right of the display and rendering tiles in that space
+        for x in range(offset[0] // self.tile_size, (offset[0] + surf.get_width()) // self.tile_size + 1):
+            for y in range(offset[1] // self.tile_size, (offset[1] + surf.get_height()) // self.tile_size + 1):
+                loc = str(x) + ';' + str(y)
+                if loc in self.tilemap:
+                    tile = self.tilemap[loc]
+                    # For the first argument - the type points to the assets, the variant says which file number we should be using. In this case we're using all 1.png files from the asset type
+                    # The second argument multiplies position by tile_size so the coordinates translate properly to the pixel distance on the screen
+                    surf.blit(self.game.assets[tile['type']][tile['variant']], (tile['pos'][0] * self.tile_size - offset[0], tile['pos'][1] * self.tile_size - offset[1]))

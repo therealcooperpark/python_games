@@ -2,14 +2,14 @@
 
 Following along with the platformer tutorial found here - https://www.youtube.com/watch?v=2gABYM5M0ww
 
-Progress:
+Tutorial Progress:
 - Introduction -- COMPLETE
 - Installing Pygame -- COMPLETE
 - Creating a Window -- COMPLETE
 - Images, Input & Collisions -- COMPLETE
 - Player, Tiles & Physics -- COMPLETE
-- Camera & Sky -- IN PROGRESS
-- Optimization -- TO DO
+- Camera & Sky -- COMPLETE
+- Optimization -- COMPLETE
 - Animation -- TO DO
 - Level Editor -- TO DO
 - Particles -- TO DO
@@ -22,3 +22,7 @@ Progress:
 - Audio -- TO DO
 - Making an executable -- TO DO
 - Next Steps -- TO DO
+
+Personal next steps:
+    - Add controlled jumps (set an input timer to detect a hop vs a jump)
+    - Document each function with a proper comment

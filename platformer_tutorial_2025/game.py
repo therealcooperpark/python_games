@@ -1,4 +1,5 @@
 import pygame
+from scripts.clouds import *
 from scripts.entities import PhysicsEntity
 from scripts.utils import *
 from scripts.tilemap import *
@@ -22,22 +23,35 @@ class Game: # Manage game settings
             'grass' : load_images('tiles/grass'),
             'large_decor' : load_images('tiles/large_decor'),
             'stone' : load_images('tiles/stone'),
-            'player' : load_image('entities/player.png')
+            'player' : load_image('entities/player.png'),
+            'background' : load_image('background.png'),
+            'clouds': load_images('clouds')
         }
+
+        self.clouds = Clouds(self.assets['clouds'], count=16)
 
         self.player = PhysicsEntity(self, 'player', (50, 50), (8, 15))
 
         self.tilemap = Tilemap(self, tile_size=16)
 
+        self.scroll = [0, 0] # The offset which simulates the concept of a "camera" (i.e., moving everything X and Y distance)
+
     def run(self):
         # Game Loop
         while True:
-            self.display.fill((14, 219, 248)) # Default screen color
+            self.display.blit(self.assets['background'], (0, 0)) # Default screen background
 
-            self.tilemap.render(self.display)
+            self.scroll[0] += (self.player.rect().centerx - self.display.get_width() / 2 - self.scroll[0]) / 30 # The camera position is the top-left. So we need to subtract the screen size to center the player
+            self.scroll[1] += (self.player.rect().centery - self.display.get_height() / 2 - self.scroll[1]) / 30 # The camera position is the top-left. So we need to subtract the screen size to center the player
+            render_scroll = (int(self.scroll[0]), int(self.scroll[1])) # Solves sub-pixel camera jittering by using int rounding/truncation
+
+            self.clouds.update()
+            self.clouds.render(self.display, offset=render_scroll)
+
+            self.tilemap.render(self.display, offset=render_scroll)
 
             self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
-            self.player.render(self.display)
+            self.player.render(self.display, offset=self.scroll)
 
             for event in pygame.event.get(): # event is where the... events get stored
                 if event.type == pygame.QUIT: # Clicking the 'x' in the window
