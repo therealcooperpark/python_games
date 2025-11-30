@@ -17,7 +17,8 @@ class Game: # Manage game settings
 
         pygame.display.set_caption('Ninja Game') # Set window name
         self.screen = pygame.display.set_mode((640, 480)) # Creating the window for the game
-        self.display = pygame.Surface((320, 240)) # What I render to. We scale this up to the window size later to multiply the size of all our assets
+        self.display = pygame.Surface((320, 240), pygame.SRCALPHA) # What I render to. We scale this up to the window size later to multiply the size of all our assets
+        self.display_2 = pygame.Surface((320, 240)) # For outlines...?
 
         self.clock = pygame.time.Clock() # Used to force the game to run at X FPS
 
@@ -80,7 +81,8 @@ class Game: # Manage game settings
     def run(self):
         # Game Loop
         while True:
-            self.display.blit(self.assets['background'], (0, 0)) # Default screen background
+            self.display.fill((0, 0, 0, 0))
+            self.display_2.blit(self.assets['background'], (0, 0)) # Default screen background
 
             self.screenshake = max(0, self.screenshake - 1)
 
@@ -109,7 +111,7 @@ class Game: # Manage game settings
                     self.particles.append(Particle(self, 'leaf', pos, velocity=[-0.1, 0.3], frame=random.randint(0, 20)))
 
             self.clouds.update()
-            self.clouds.render(self.display, offset=render_scroll)
+            self.clouds.render(self.display_2, offset=render_scroll)
 
             self.tilemap.render(self.display, offset=render_scroll)
 
@@ -128,6 +130,11 @@ class Game: # Manage game settings
                 spark.render(self.display, offset=render_scroll)
                 if kill:
                     self.sparks.remove(spark)
+
+            display_mask = pygame.mask.from_surface(self.display)
+            display_sillhouette = display_mask.to_surface(setcolor=(0, 0, 0, 180), unsetcolor = (0, 0, 0, 0))
+            for offset in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                self.display_2.blit(display_sillhouette, offset)
 
             # Projectile = [[x, y], direction, timer]
             for projectile in self.projectiles.copy():
@@ -186,8 +193,10 @@ class Game: # Manage game settings
                 transition_surf.set_colorkey((255, 255, 255))
                 self.display.blit(transition_surf, (0, 0))
 
+            self.display_2.blit(self.display, (0, 0))
+
             screenshake_offset = (random.random() * self.screenshake - self.screenshake / 2, random.random() * self.screenshake - self.screenshake / 2)
-            self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), screenshake_offset) # Where the resizing happens for the pixel art
+            self.screen.blit(pygame.transform.scale(self.display_2, self.screen.get_size()), screenshake_offset) # Where the resizing happens for the pixel art
             pygame.display.update() # Updates the display
             self.clock.tick(60) # Limits the game to 60 FPS
 

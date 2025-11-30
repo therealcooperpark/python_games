@@ -17,8 +17,8 @@ Tutorial Progress:
 - Dash Attack -- COMPLETE
 - Enemies, Guns, Death, etc. -- COMPLETE
 - Screenshake -- COMPLETE
-- Level Transitions -- TO DO
-- Outlines -- TO DO
+- Level Transitions -- COMPLETE
+- Outlines -- COMPLETE
 - Audio -- TO DO
 - Making an executable -- TO DO
 - Next Steps -- TO DO
