@@ -1,4 +1,7 @@
+import math
 import pygame
+from scripts.particle import Particle
+import random
 
 class PhysicsEntity:
     def __init__ (self, game, e_type, pos, size):
@@ -13,6 +16,7 @@ class PhysicsEntity:
         self.anim_offset = (-3, -3) # Buffer space for animation images to exceed the "hitbox" of the entity
         self.flip = False
         self.set_action('idle')
+        self.last_movement = [0, 0]
 
     def rect(self):
         return pygame.Rect(self.pos[0], self.pos[1], self.size[0], self.size[1])
@@ -57,6 +61,8 @@ class PhysicsEntity:
         if movement[0] < 0:
             self.flip = True
 
+        self.last_movement = movement
+
         self.velocity[1] = min(5, self.velocity[1] + 0.1) # Apply gravity acceleration after the movement has been calculated 
 
         if self.collisions['down'] or self.collisions['up']: # Reset veloicty when up/down contact has been made
@@ -72,18 +78,93 @@ class Player(PhysicsEntity):
     def __init__(self, game, pos, size):
         super().__init__(game, 'player', pos, size)
         self.air_time = 0
+        self.jumps = 1
+        self.wall_slide = False
+        self.dashing = 0
 
     def update(self, tilemap, movement=(0, 0)):
         super().update(tilemap, movement=movement)
         
+        # Reset jump
         self.air_time += 1
         if self.collisions['down']:
             self.air_time = 0
+            self.jumps = 1
+
+        # Track and handle logic for wall slide
+        self.wall_slide = False
+        if (self.collisions['left'] or self.collisions['right']) and self.air_time > 4:
+            self.wall_slide = True
+            self.velocity[1] = min(self.velocity[1], 0.5) # Cap wall sliding velocity
+            if self.collisions['right']:
+                self.flip = False
+            else:
+                self.flip = True
+            self.set_action('wall_slide') 
         
         # Set the animation based on movement status
-        if self.air_time > 4:
-            self.set_action('jump')
-        elif movement[0] != 0:
-            self.set_action('run')
+        if not self.wall_slide:
+            if self.air_time > 4:
+                self.set_action('jump')
+            elif movement[0] != 0:
+                self.set_action('run')
+            else:
+                self.set_action('idle')
+
+        # Handle dashing
+        # Generate a random burst particle with random directions when triggered
+        if abs(self.dashing) in {60, 50}:
+            for i in range(20):
+                angle = random.random() * math.pi * 2
+                speed = random.random() * 0.5 + 0.5
+                pvelocity = [math.cos(angle) * speed, math.sin(angle) * speed] # Particle velocity
+                self.game.particles.append(Particle(self.game, 'particle', self.rect().center, velocity=pvelocity, frame = random.randint(0, 7)))
+        if self.dashing > 0:
+            self.dashing = max(self.dashing - 1, 0)
+        if self.dashing < 0:
+            self.dashing = min(self.dashing + 1, 0)
+        if abs(self.dashing) > 50:
+            self.velocity[0] = abs(self.dashing) / self.dashing * 8
+            if abs(self.dashing) == 51:
+                self.velocity[0] *= 0.1
+                # Generate a stream of particles behind player during dash
+                pvelocity = [abs(self.dashing) / self.dashing * random.random() * 3, 0]
+                self.game.particles.append(Particle(self.game, 'particle', self.rect().center, velocity=pvelocity, frame = random.randint(0, 7)))
+
+        # Stop player from moving on x-axis permanently
+        if self.velocity[0] > 0:
+            self.velocity[0] = max(self.velocity[0] - 0.1, 0)
         else:
-            self.set_action('idle')
+            self.velocity[0] = min(self.velocity[0] + 0.1, 0)
+
+    def render(self, surf, offset=(0, 0)):
+        if abs(self.dashing) <= 50:
+            super().render(surf, offset=offset)
+
+
+    def jump(self):
+        if self.wall_slide:
+            if self.flip and self.last_movement[0] < 0:
+                self.velocity[0] = 3.5
+                self.velocity[1] = -2.5
+                self.air_time = 5
+                self.jumps = max(0, self.jumps - 1)
+                return True
+            elif not self.flip and self.last_movement[0] > 0:
+                self.velocity[0] = -3.5
+                self.velocity[1] = -2.5
+                self.air_time = 5
+                self.jumps = max(0, self.jumps - 1)
+                return True
+        elif self.jumps:
+            self.velocity[1] = -3 # Change velocity
+            self.jumps -= 1 # Decrease jumps
+            self.air_time = 5 # Add air_time, forcing jump animation
+            return True
+        
+    def dash(self):
+        if not self.dashing:
+            if self.flip:
+                self.dashing = -60
+            else:
+                self.dashing = 60

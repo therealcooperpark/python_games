@@ -13,9 +13,9 @@ Tutorial Progress:
 - Animation -- COMPLETE
 - Level Editor -- COMPLETE
 - Particles -- COMPLETE
-- Jump & Slide -- IN PROGRESS
-- Dash Attack -- TO DO
-- Enemies, Guns, Death, etc. -- TO DO
+- Jump & Slide -- COMPLETE
+- Dash Attack -- COMPLETE
+- Enemies, Guns, Death, etc. -- IN PROGRESS
 - Screenshake -- TO DO
 - Level Transitions -- TO DO
 - Outlines -- TO DO
