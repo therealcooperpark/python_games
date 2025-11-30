@@ -23,6 +23,12 @@ Tutorial Progress:
 - Making an executable -- TO DO
 - Next Steps -- TO DO
 
+Troubleshooting:
+    - Audio
+        - Needed to install pulseaudio and configure using info in audio_fix.md
+    - Installer
+        - Run `poetry run pyinstaller game.py --noconsole` to compile the game for sharing. Only works on Linux because that's how pyinstaller works.
+
 Personal next steps:
     - Add controlled jumps (set an input timer to detect a hop vs a jump)
     - Document each function with a proper comment
