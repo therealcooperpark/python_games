@@ -1,5 +1,6 @@
 import pygame
 import math
+import os
 import random
 from scripts.clouds import *
 from scripts.entities import *
@@ -48,7 +49,8 @@ class Game: # Manage game settings
         self.player = Player(self, (50, 50), (8, 15))
 
         self.tilemap = Tilemap(self, tile_size=16)
-        self.load_level('0')
+        self.level = 0
+        self.load_level(self.level)
 
         self.screenshake = 0
 
@@ -73,6 +75,7 @@ class Game: # Manage game settings
 
         self.scroll = [0, 0] # The offset which simulates the concept of a "camera" (i.e., moving everything X and Y distance)
         self.dead = 0 # Is player dead?
+        self.transition = -30 # Transition speed when moving to a new level
 
     def run(self):
         # Game Loop
@@ -81,10 +84,20 @@ class Game: # Manage game settings
 
             self.screenshake = max(0, self.screenshake - 1)
 
+            if not len(self.enemies):
+                self.transition += 1
+                if self.transition > 30:
+                    self.level = min(self.level + 1, len(os.listdir('data/maps')) - 1)
+                    self.load_level(self.level)
+            if self.transition < 0:
+                self.transition += 1
+
             if self.dead: # You died, start over in 40 frames
                 self.dead += 1
+                if self.dead >= 10:
+                    self.transition = min(30, self.transition + 1)
                 if self.dead > 40:
-                    self.load_level(0)
+                    self.load_level(self.level)
 
             self.scroll[0] += (self.player.rect().centerx - self.display.get_width() / 2 - self.scroll[0]) / 30 # The camera position is the top-left. So we need to subtract the screen size to center the player
             self.scroll[1] += (self.player.rect().centery - self.display.get_height() / 2 - self.scroll[1]) / 30 # The camera position is the top-left. So we need to subtract the screen size to center the player
@@ -166,6 +179,12 @@ class Game: # Manage game settings
                         self.movement[0] = False
                     if event.key == pygame.K_RIGHT:
                         self.movement[1] = False
+
+            if self.transition:
+                transition_surf = pygame.Surface(self.display.get_size())
+                pygame.draw.circle(transition_surf, (255, 255, 255), (self.display.get_width() // 2, self.display.get_height() // 2), (30 - abs(self.transition)) * 8)
+                transition_surf.set_colorkey((255, 255, 255))
+                self.display.blit(transition_surf, (0, 0))
 
             screenshake_offset = (random.random() * self.screenshake - self.screenshake / 2, random.random() * self.screenshake - self.screenshake / 2)
             self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), screenshake_offset) # Where the resizing happens for the pixel art
