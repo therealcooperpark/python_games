@@ -13,12 +13,13 @@ import sys
 
 class Game: # Manage game settings
     def __init__(self):
-        pygame.init() # Turn the game on?
+        pygame.mixer.pre_init(44100, -16, 2, 128) # Lower buffer for mixer to improve latency
+        pygame.init() # Initialize pygame resources
 
         pygame.display.set_caption('Ninja Game') # Set window name
         self.screen = pygame.display.set_mode((640, 480)) # Creating the window for the game
         self.display = pygame.Surface((320, 240), pygame.SRCALPHA) # What I render to. We scale this up to the window size later to multiply the size of all our assets
-        self.display_2 = pygame.Surface((320, 240)) # For outlines...?
+        self.display_2 = pygame.Surface((320, 240)) # For content that should have outline
 
         self.clock = pygame.time.Clock() # Used to force the game to run at X FPS
 
@@ -44,6 +45,22 @@ class Game: # Manage game settings
             'gun': load_image('gun.png'),
             'projectile': load_image('projectile.png'),
         }
+
+        # Setting sound affects
+        print(pygame.mixer.get_init())
+        self.sfx = {
+            'jump': pygame.mixer.Sound('data/sfx/jump.wav'),
+            'dash': pygame.mixer.Sound('data/sfx/dash.wav'),
+            'hit': pygame.mixer.Sound('data/sfx/hit.wav'),
+            'shoot': pygame.mixer.Sound('data/sfx/shoot.wav'),
+            'ambience': pygame.mixer.Sound('data/sfx/ambience.wav'),
+        }
+
+        self.sfx['ambience'].set_volume(0.2)
+        self.sfx['shoot'].set_volume(0.4)
+        self.sfx['hit'].set_volume(0.8)
+        self.sfx['dash'].set_volume(0.3)
+        self.sfx['jump'].set_volume(0.7)
 
         self.clouds = Clouds(self.assets['clouds'], count=16)
 
@@ -79,6 +96,13 @@ class Game: # Manage game settings
         self.transition = -30 # Transition speed when moving to a new level
 
     def run(self):
+        # Play the background music
+        pygame.mixer.music.load('data/music.wav')
+        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.play(-1) # Num = loops, -1 is infinite loop
+
+        self.sfx['ambience'].play(-1)
+
         # Game Loop
         while True:
             self.display.fill((0, 0, 0, 0))
@@ -131,6 +155,7 @@ class Game: # Manage game settings
                 if kill:
                     self.sparks.remove(spark)
 
+            # Handle outlining
             display_mask = pygame.mask.from_surface(self.display)
             display_sillhouette = display_mask.to_surface(setcolor=(0, 0, 0, 180), unsetcolor = (0, 0, 0, 0))
             for offset in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
@@ -152,6 +177,7 @@ class Game: # Manage game settings
                     if self.player.rect().collidepoint(projectile[0]):
                         self.projectiles.remove(projectile)
                         self.dead += 1
+                        self.sfx['hit'].play()
                         self.screenshake = max(16, self.screenshake)
                         for i in range(30):
                             angle = random.random() * math.pi * 2
@@ -178,7 +204,8 @@ class Game: # Manage game settings
                     if event.key == pygame.K_RIGHT:
                         self.movement[1] = True
                     if event.key == pygame.K_UP:
-                        self.player.jump()
+                        if self.player.jump():
+                            self.sfx['jump'].play()
                     if event.key == pygame.K_x:
                         self.player.dash()
                 if event.type == pygame.KEYUP:

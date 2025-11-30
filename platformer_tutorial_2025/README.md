@@ -19,7 +19,7 @@ Tutorial Progress:
 - Screenshake -- COMPLETE
 - Level Transitions -- COMPLETE
 - Outlines -- COMPLETE
-- Audio -- TO DO
+- Audio -- COMPLETE
 - Making an executable -- TO DO
 - Next Steps -- TO DO
 

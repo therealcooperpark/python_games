@@ -6,9 +6,10 @@ authors = [
     {name = "Cooper Park"}
 ]
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<3.15"
 dependencies = [
-    "pygame-ce (>=2.5.6,<3.0.0)"
+    "pygame-ce (>=2.5.6,<3.0.0)",
+    "pyinstaller (>=6.17.0,<7.0.0)"
 ]
 
 
