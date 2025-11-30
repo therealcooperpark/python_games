@@ -12,8 +12,8 @@ Tutorial Progress:
 - Optimization -- COMPLETE
 - Animation -- COMPLETE
 - Level Editor -- COMPLETE
-- Particles -- TO DO
-- Jump & Slide -- TO DO
+- Particles -- COMPLETE
+- Jump & Slide -- IN PROGRESS
 - Dash Attack -- TO DO
 - Enemies, Guns, Death, etc. -- TO DO
 - Screenshake -- TO DO

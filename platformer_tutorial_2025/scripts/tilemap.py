@@ -26,6 +26,27 @@ class Tilemap:
         self.tilemap = {} # Tracking all of the organized tiles that make up the map. Each tile is mapped using location as a key. Tiles without a map are assumed to be "empty space"
         self.offgrid_tiles = [] # Tracking non-grid tiles. Components of this are the same as tilemap objects, but their position is calculated by pixel, not tile.
 
+    def extract(self, id_pairs, keep=False):
+        # Take a list of IDs (type + variant) and determine whether a tile is in that list
+        # Keep allows us to remove the tile from the map
+        matches = []
+        for tile in self.offgrid_tiles.copy(): # Copy required in case we're deleting later
+            if (tile['type'], tile['variant']) in id_pairs:
+                matches.append(tile.copy())
+                if not keep:
+                    self.offgrid_tiles.remove(tile)
+
+        for loc in self.tilemap:
+            tile = self.tilemap[loc]
+            if (tile['type'], tile['variant']) in id_pairs:
+                matches.append(tile.copy())
+                matches[-1]['pos'] = matches[-1]['pos'].copy() # Copy so we can transform in the match
+                matches[-1]['pos'][0] *= self.tile_size # Change size for location in tiles
+                matches[-1]['pos'][1] *= self.tile_size 
+                if not keep:
+                    del self.tilemap[loc]
+        return matches
+
     def tiles_around(self, pos): # Find all tiles that collide with a given position
         tiles = []
         tile_loc = (int(pos[0] // self.tile_size), int(pos[1] // self.tile_size))

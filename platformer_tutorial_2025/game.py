@@ -1,6 +1,9 @@
 import pygame
+import math
+import random
 from scripts.clouds import *
 from scripts.entities import *
+from scripts.particle import *
 from scripts.utils import *
 from scripts.tilemap import *
 import sys
@@ -30,7 +33,8 @@ class Game: # Manage game settings
             'player/run': Animation(load_images('entities/player/run'), img_dur=4),
             'player/jump': Animation(load_images('entities/player/jump')),
             'player/slide': Animation(load_images('entities/player/slide')),
-            'player/wall_slide': Animation(load_images('entities/player/wall_slide'))
+            'player/wall_slide': Animation(load_images('entities/player/wall_slide')),
+            'particle/leaf': Animation(load_images('particles/leaf'), img_dur=20, loop=False)
         }
 
         self.clouds = Clouds(self.assets['clouds'], count=16)
@@ -39,6 +43,12 @@ class Game: # Manage game settings
 
         self.tilemap = Tilemap(self, tile_size=16)
         self.tilemap.load('map.json')
+
+        self.leaf_spawners = []
+        for tree in self.tilemap.extract([('large_decor', 2)], keep=True):
+            self.leaf_spawners.append(pygame.Rect(4 + tree['pos'][0], 4 + tree['pos'][1], 23, 13)) # Offset by 4 pixels for leaf falling. Numbers based on tree img size
+
+        self.particles = []
 
         self.scroll = [0, 0] # The offset which simulates the concept of a "camera" (i.e., moving everything X and Y distance)
 
@@ -51,6 +61,11 @@ class Game: # Manage game settings
             self.scroll[1] += (self.player.rect().centery - self.display.get_height() / 2 - self.scroll[1]) / 30 # The camera position is the top-left. So we need to subtract the screen size to center the player
             render_scroll = (int(self.scroll[0]), int(self.scroll[1])) # Solves sub-pixel camera jittering by using int rounding/truncation
 
+            for rect in self.leaf_spawners:
+                if random.random() * 49999 < rect.width * rect.height: # Control spawn rate in relation to the size of the tree
+                    pos = (rect.x + random.random() * rect.width, rect.y + random.random() * rect.height)
+                    self.particles.append(Particle(self, 'leaf', pos, velocity=[-0.1, 0.3], frame=random.randint(0, 20)))
+
             self.clouds.update()
             self.clouds.render(self.display, offset=render_scroll)
 
@@ -58,6 +73,14 @@ class Game: # Manage game settings
 
             self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
             self.player.render(self.display, offset=self.scroll)
+
+            for particle in self.particles.copy():
+                kill = particle.update()
+                particle.render(self.display, offset=render_scroll)
+                if particle.type == 'leaf':
+                    particle.pos[0] += math.sin(particle.animation.frame * 0.035) * 0.3 # Put a wobble on the leaf fall with a sin wave
+                if kill:
+                    self.particles.remove(particle)
 
             for event in pygame.event.get(): # event is where the... events get stored
                 if event.type == pygame.QUIT: # Clicking the 'x' in the window
