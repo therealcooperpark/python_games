@@ -15,7 +15,7 @@ Tutorial Progress:
 - Particles -- COMPLETE
 - Jump & Slide -- COMPLETE
 - Dash Attack -- COMPLETE
-- Enemies, Guns, Death, etc. -- IN PROGRESS
+- Enemies, Guns, Death, etc. -- COMPLETE
 - Screenshake -- TO DO
 - Level Transitions -- TO DO
 - Outlines -- TO DO
