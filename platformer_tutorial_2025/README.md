@@ -20,8 +20,8 @@ Tutorial Progress:
 - Level Transitions -- COMPLETE
 - Outlines -- COMPLETE
 - Audio -- COMPLETE
-- Making an executable -- TO DO
-- Next Steps -- TO DO
+- Making an executable -- COMPLETE
+- Next Steps -- COMPLETE
 
 Troubleshooting:
     - Audio
