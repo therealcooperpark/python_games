@@ -10,7 +10,7 @@ Tutorial Progress:
 - Player, Tiles & Physics -- COMPLETE
 - Camera & Sky -- COMPLETE
 - Optimization -- COMPLETE
-- Animation -- TO DO
+- Animation -- COMPLETE
 - Level Editor -- TO DO
 - Particles -- TO DO
 - Jump & Slide -- TO DO
