@@ -11,7 +11,7 @@ Tutorial Progress:
 - Camera & Sky -- COMPLETE
 - Optimization -- COMPLETE
 - Animation -- COMPLETE
-- Level Editor -- TO DO
+- Level Editor -- COMPLETE
 - Particles -- TO DO
 - Jump & Slide -- TO DO
 - Dash Attack -- TO DO

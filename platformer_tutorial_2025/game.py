@@ -38,6 +38,7 @@ class Game: # Manage game settings
         self.player = Player(self, (50, 50), (8, 15))
 
         self.tilemap = Tilemap(self, tile_size=16)
+        self.tilemap.load('map.json')
 
         self.scroll = [0, 0] # The offset which simulates the concept of a "camera" (i.e., moving everything X and Y distance)
 
