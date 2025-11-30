@@ -16,7 +16,7 @@ Tutorial Progress:
 - Jump & Slide -- COMPLETE
 - Dash Attack -- COMPLETE
 - Enemies, Guns, Death, etc. -- COMPLETE
-- Screenshake -- TO DO
+- Screenshake -- COMPLETE
 - Level Transitions -- TO DO
 - Outlines -- TO DO
 - Audio -- TO DO
