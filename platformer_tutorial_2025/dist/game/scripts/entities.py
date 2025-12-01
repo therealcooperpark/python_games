@@ -95,14 +95,14 @@ class Enemy(PhysicsEntity):
                 if (abs(dis[1]) < 16):
                     if (self.flip and dis[0] < 0): # Enemy must be facing player
                         self.game.sfx['shoot'].play()
-                        self.game.projectiles.append([[self.rect().centerx - 7, self.rect().centery], -1.5, 0])
+                        self.game.state.projectiles.append([[self.rect().centerx - 7, self.rect().centery], -1.5, 0])
                         for i in range(4):
-                            self.game.sparks.append(Spark(self.game.projectiles[-1][0], random.random() - 0.5 + math.pi, 2 + random.random()))
+                            self.game.state.sparks.append(Spark(self.game.state.projectiles[-1][0], random.random() - 0.5 + math.pi, 2 + random.random()))
                     if (not self.flip and dis[0] > 0):
                         self.game.sfx['shoot'].play()
-                        self.game.projectiles.append([[self.rect().centerx + 7, self.rect().centery], 1.5, 0])
+                        self.game.state.projectiles.append([[self.rect().centerx + 7, self.rect().centery], 1.5, 0])
                         for i in range(4):
-                            self.game.sparks.append(Spark(self.game.projectiles[-1][0], random.random() - 0.5, 2 + random.random()))
+                            self.game.state.sparks.append(Spark(self.game.state.projectiles[-1][0], random.random() - 0.5, 2 + random.random()))
         elif random.random() < 0.01: # Start walking on a semi-random cadence if not already walking
             self.walking = random.randint(30, 120)
 
@@ -120,11 +120,11 @@ class Enemy(PhysicsEntity):
                 for i in range(30):
                     angle = random.random() * math.pi * 2
                     speed = random.random() * 5
-                    self.game.sparks.append(Spark(self.rect().center, angle, 2 + random.random()))
-                    self.game.particles.append(Particle(self.game, 'particle', self.rect().center, velocity=[math.cos(angle + math.pi) * speed * 0.5, math.sin(angle + math.pi) * speed * 0.5], frame=random.randint(0, 7)))
+                    self.game.state.sparks.append(Spark(self.rect().center, angle, 2 + random.random()))
+                    self.game.state.particles.append(Particle(self.game, 'particle', self.rect().center, velocity=[math.cos(angle + math.pi) * speed * 0.5, math.sin(angle + math.pi) * speed * 0.5], frame=random.randint(0, 7)))
                 print('ENEMY KILLED!')
-                self.game.sparks.append(Spark(self.rect().center, 0, 5 + random.random()))
-                self.game.sparks.append(Spark(self.rect().center, math.pi, 5 + random.random()))
+                self.game.state.sparks.append(Spark(self.rect().center, 0, 5 + random.random()))
+                self.game.state.sparks.append(Spark(self.rect().center, math.pi, 5 + random.random()))
                 return True
 
     def render(self, surf, offset=(0, 0)):
@@ -151,7 +151,7 @@ class Player(PhysicsEntity):
         self.air_time += 1
 
         if self.air_time > 120: # Avoid infinite fall
-            self.game.dead = 1
+            self.game.state.dead = 1
             self.game.screenshake = max(16, self.game.screenshake)
 
         if self.collisions['down']:
@@ -185,7 +185,7 @@ class Player(PhysicsEntity):
                 angle = random.random() * math.pi * 2
                 speed = random.random() * 0.5 + 0.5
                 pvelocity = [math.cos(angle) * speed, math.sin(angle) * speed] # Particle velocity
-                self.game.particles.append(Particle(self.game, 'particle', self.rect().center, velocity=pvelocity, frame = random.randint(0, 7)))
+                self.game.state.particles.append(Particle(self.game, 'particle', self.rect().center, velocity=pvelocity, frame = random.randint(0, 7)))
         if self.dashing > 0:
             self.dashing = max(self.dashing - 1, 0)
         if self.dashing < 0:
@@ -196,7 +196,7 @@ class Player(PhysicsEntity):
                 self.velocity[0] *= 0.1
                 # Generate a stream of particles behind player during dash
                 pvelocity = [abs(self.dashing) / self.dashing * random.random() * 3, 0]
-                self.game.particles.append(Particle(self.game, 'particle', self.rect().center, velocity=pvelocity, frame = random.randint(0, 7)))
+                self.game.state.particles.append(Particle(self.game, 'particle', self.rect().center, velocity=pvelocity, frame = random.randint(0, 7)))
 
         # Stop player from moving on x-axis permanently
         if self.velocity[0] > 0:
