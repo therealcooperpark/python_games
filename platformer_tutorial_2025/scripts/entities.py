@@ -163,6 +163,7 @@ class Player(PhysicsEntity):
         if (self.collisions['left'] or self.collisions['right']) and self.air_time > 4:
             self.wall_slide = True
             self.velocity[1] = min(self.velocity[1], 0.5) # Cap wall sliding velocity
+            self.air_time = 5 # Freeze and reset air_time to prevent permanent fall death on long slide
             if self.collisions['right']:
                 self.flip = False
             else:
