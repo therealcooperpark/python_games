@@ -75,7 +75,7 @@ class PauseScene(Scene):
 
     def render_pause(self):
         # TODO: This is centered correctly, but I need a proper pause screen...
-        pygame.draw.circle(self.pause_display, (255, 255, 255), (self.pause_display.get_width(), self.pause_display.get_height()), 100)
+        pygame.draw.circle(self.pause_display, (255, 255, 255), (self.pause_display.get_width() // 2, self.pause_display.get_height() // 2), self.pause_display.get_width() // 3)
         self.game.screen.blit(self.pause_display, (self.game.screen.get_width() // 2 - self.pause_display.get_width() // 2, self.game.screen.get_height() // 2 - self.pause_display.get_height() // 2))
 
 
