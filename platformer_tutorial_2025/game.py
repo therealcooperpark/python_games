@@ -5,6 +5,7 @@ import random
 from scripts.clouds import Cloud, Clouds
 from scripts.entities import Enemy, PhysicsEntity, Player
 from scripts.particle import Particle
+from scripts.scene import Scene, GameplayScene, PauseScene
 from scripts.spark import Spark
 from scripts.utils import load_image, load_images, Animation
 from scripts.tilemap import Tilemap
@@ -22,7 +23,8 @@ class Game: # Manage game settings
 
         self.clock = pygame.time.Clock() # Used to force the game to run at X FPS
 
-        self.state = GameState(self, 0)
+        self.state = GameplayScene(self, 0)
+        self.pause_state = PauseScene(self)
 
         self.movement = [False, False] # Used to track movement triggers by the player
 
@@ -72,9 +74,6 @@ class Game: # Manage game settings
         self.state.load_level(self.state.level)
 
         self.screenshake = 0
-
-    def load_level(self, map_id):
-        self.state.load_level(map_id)
 
     def run(self):
         # Play the background music
@@ -189,6 +188,8 @@ class Game: # Manage game settings
                             self.sfx['jump'].play()
                     if event.key == pygame.K_x:
                         self.player.dash()
+                    if event.key == pygame.K_ESCAPE:
+                        self.pause_state.pause()
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_LEFT:
                         self.movement[0] = False
@@ -207,42 +208,6 @@ class Game: # Manage game settings
             self.screen.blit(pygame.transform.scale(self.display_2, self.screen.get_size()), screenshake_offset) # Where the resizing happens for the pixel art
             pygame.display.update() # Updates the display
             self.clock.tick(60) # Limits the game to 60 FPS
-
-class GameState:
-    '''
-    Handles level logic, player status, and transitions
-    '''
-    def __init__(self, game, level):
-        self.game = game
-        self.level = level # Current level
-
-    def load_level(self, map_id):
-        # Load map
-        self.game.tilemap.load('data/maps/' + str(map_id) + '.json')
-
-        # Handle leaf spawners
-        self.leaf_spawners = []
-        for tree in self.game.tilemap.extract([('large_decor', 2)], keep=True):
-            self.leaf_spawners.append(pygame.Rect(4 + tree['pos'][0], 4 + tree['pos'][1], 23, 13)) # Offset by 4 pixels for leaf falling. Numbers based on tree img size
-
-        # Handle original Player/Enemy Spawners
-        self.enemies = []
-        for spawner in self.game.tilemap.extract([('spawners', 0), ('spawners', 1)]):
-            if spawner['variant'] == 0: # Player variant
-                self.game.player.pos = spawner['pos']
-                self.game.player.air_time = 0 # Reset on respawn
-            else:
-                self.enemies.append(Enemy(self.game, spawner['pos'], (8, 15)))
-        
-        # Reset other entity collections
-        self.projectiles = []
-        self.particles = []
-        self.sparks = []
-
-        # Reset values
-        self.dead = 0 # Number boolean for if player is dead
-        self.transition = -30 # Transition speed when moving to a new level
-        self.game.scroll = [0, 0] # Offset which emulates a "camera" experience
         
 
 Game().run()
