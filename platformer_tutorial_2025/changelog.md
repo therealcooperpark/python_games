@@ -1,4 +1,5 @@
 ## 12/3/2025
+- Added health and damage system
 - Cleaned repo and prepared plan for a "complete" game
 
 ## 12/2/2025
