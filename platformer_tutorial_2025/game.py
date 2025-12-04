@@ -136,30 +136,10 @@ class Game: # Manage game settings
         for offset in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
             self.display_2.blit(display_sillhouette, offset)
 
-        # Projectile = [[x, y], direction, timer]
         for projectile in self.state.projectiles.copy():
-            projectile[0][0] += projectile[1]
-            projectile[2] += 1
-            img = self.assets['projectile']
-            self.display.blit(img, (projectile[0][0] - img.get_width() / 2 - render_scroll[0], projectile[0][1] - img.get_height() / 2 - render_scroll[1]))
-            if self.tilemap.solid_check(projectile[0]): # Remove on collision with physics tile
-                self.state.projectiles.remove(projectile)
-                for i in range(4):
-                    self.state.sparks.append(Spark(projectile[0], random.random() - 0.5 + (math.pi if projectile[1] > 0 else 0), 2 + random.random()))
-            elif projectile[2] > 360: # Time out the projectile
-                self.state.projectiles.remove(projectile)
-            elif abs(self.player.dashing) < 50:
-                if self.player.rect().collidepoint(projectile[0]):
-                    self.state.projectiles.remove(projectile)
-                    self.state.dead += 1
-                    self.sfx['hit'].play()
-                    self.screenshake = max(16, self.screenshake)
-                    for i in range(30):
-                        angle = random.random() * math.pi * 2
-                        speed = random.random() * 5
-                        self.state.sparks.append(Spark(self.player.rect().center, angle, 2 + random.random()))
-                        self.state.particles.append(Particle(self, 'particle', self.player.rect().center, velocity=[math.cos(angle + math.pi) * speed * 0.5, math.sin(angle + math.pi) * speed * 0.5], frame=random.randint(0, 7)))
-                    print('PLAYER HIT!')
+            projectile.move()
+            projectile.render(self.display, render_scroll)
+            projectile.update()
 
         for particle in self.state.particles.copy():
             kill = particle.update()
