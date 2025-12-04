@@ -75,9 +75,10 @@ class PhysicsEntity:
         surf.blit(pygame.transform.flip(self.animation.img(), self.flip, False), (self.pos[0] - offset[0] + self.anim_offset[0], self.pos[1] - offset[1] + self.anim_offset[1]))
 
 class Enemy(PhysicsEntity):
-    def __init__(self, game, pos, size):
+    def __init__(self, game, pos, size, health=1):
         super().__init__(game, 'enemy', pos, size)
 
+        self.health = health
         self.walking = 0 # Frame timer to track when they should be walking in one direction
 
     def update(self, tilemap, movement=(0, 0)):
@@ -137,9 +138,10 @@ class Enemy(PhysicsEntity):
 
 class Player(PhysicsEntity):
     # Handles the animation logic for the Player physics entity (and probably other stuff)
-    def __init__(self, game, pos, size):
+    def __init__(self, game, pos, size, health=1):
         super().__init__(game, 'player', pos, size)
         self.air_time = 0
+        self.health = health
         self.jumps = 1
         self.wall_slide = False
         self.dashing = 0
