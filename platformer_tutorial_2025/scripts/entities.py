@@ -75,11 +75,15 @@ class PhysicsEntity:
     def render(self, surf, offset=(0, 0)):
         surf.blit(pygame.transform.flip(self.animation.img(), self.flip, False), (self.pos[0] - offset[0] + self.anim_offset[0], self.pos[1] - offset[1] + self.anim_offset[1]))
 
-class Enemy(PhysicsEntity):
-    def __init__(self, game, pos, size, health=1):
-        super().__init__(game, 'enemy', pos, size)
 
+class Enemy(PhysicsEntity):
+    def __init__(self, game, pos, size, health, damage, i_window=30):
+        super().__init__(game, 'enemy', pos, size)
         self.health = health
+        self.damage = damage
+        self.i_window = i_window # How many frames of invincibility granted on hit
+        self.iframes = 0 # How many frames of invincibility left
+
         self.walking = 0 # Frame timer to track when they should be walking in one direction
 
     def update(self, tilemap, movement=(0, 0)):
@@ -117,19 +121,28 @@ class Enemy(PhysicsEntity):
         else:
             self.set_action('idle')
 
+        # Process any attack received
+        self.iframes = max(0, self.iframes - 1)
         if abs(self.game.player.dashing) >= 50:
-            if self.rect().colliderect(self.game.player.rect()): # If enemy collides with rect of dashing player
+            if self.rect().colliderect(self.game.player.rect()) and self.iframes == 0: # If enemy collides with rect of dashing player and isn't immune
                 self.game.screenshake = max(16, self.game.screenshake)
                 self.game.sfx['hit'].play()
-                for i in range(30):
-                    angle = random.random() * math.pi * 2
-                    speed = random.random() * 5
-                    self.game.state.sparks.append(Spark(self.rect().center, angle, 2 + random.random()))
-                    self.game.state.particles.append(Particle(self.game, 'particle', self.rect().center, velocity=[math.cos(angle + math.pi) * speed * 0.5, math.sin(angle + math.pi) * speed * 0.5], frame=random.randint(0, 7)))
-                print('ENEMY KILLED!')
-                self.game.state.sparks.append(Spark(self.rect().center, 0, 5 + random.random()))
-                self.game.state.sparks.append(Spark(self.rect().center, math.pi, 5 + random.random()))
-                return True
+                self.health -= self.game.player.damage
+                if self.health > 0:
+                    print(f'ENEMY HIT:\nDamage taken: {self.game.player.damage}\nRemaining health: {self.health}')
+                    self.iframes += self.i_window
+                    self.game.state.sparks.append(Spark(self.rect().center, 0, 5 + random.random()))
+                    self.game.state.sparks.append(Spark(self.rect().center, math.pi, 5 + random.random()))
+                elif self.health <= 0:
+                    for i in range(30):
+                        angle = random.random() * math.pi * 2
+                        speed = random.random() * 5
+                        self.game.state.sparks.append(Spark(self.rect().center, angle, 2 + random.random()))
+                        self.game.state.particles.append(Particle(self.game, 'particle', self.rect().center, velocity=[math.cos(angle + math.pi) * speed * 0.5, math.sin(angle + math.pi) * speed * 0.5], frame=random.randint(0, 7)))
+                    print('ENEMY KILLED!')
+                    self.game.state.sparks.append(Spark(self.rect().center, 0, 5 + random.random()))
+                    self.game.state.sparks.append(Spark(self.rect().center, math.pi, 5 + random.random()))
+                    return True
 
     def render(self, surf, offset=(0, 0)):
         super().render(surf, offset=offset)
@@ -141,10 +154,11 @@ class Enemy(PhysicsEntity):
 
 class Player(PhysicsEntity):
     # Handles the animation logic for the Player physics entity (and probably other stuff)
-    def __init__(self, game, pos, size, health=1):
+    def __init__(self, game, pos, size, health=1, damage=10):
         super().__init__(game, 'player', pos, size)
         self.air_time = 0
         self.health = health
+        self.damage = damage
         self.jumps = 1
         self.wall_slide = False
         self.dashing = 0
