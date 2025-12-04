@@ -68,7 +68,7 @@ class Game: # Manage game settings
 
         self.clouds = Clouds(self.assets['clouds'], count=16)
 
-        self.player = Player(self, (50, 50), (8, 15))
+        self.player = Player(self, (50, 50), (8, 15), health=30)
 
         self.tilemap = Tilemap(self, tile_size=16)
         

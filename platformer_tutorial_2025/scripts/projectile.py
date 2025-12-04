@@ -26,20 +26,24 @@ class Projectile():
             for i in range(4):
                 self.game.state.sparks.append(Spark(self.pos, random.random() - 0.5 + (math.pi if self.direction > 0 else 0), 2 + random.random()))
         elif self.timer > 360: # Time out the projectile
-            self.game.state.projectiles.remove(projectile)
+            self.game.state.projectiles.remove(self)
         elif abs(self.game.player.dashing) < 50:
             if self.game.player.rect().collidepoint(self.pos):
                 self.game.state.projectiles.remove(self)
-                # TODO: Move this logic into the damage / kill code later
-                self.game.state.dead += 1
                 self.game.sfx['hit'].play()
-                self.game.screenshake = max(16, self.game.screenshake)
+                alive = self.game.player.take_damage(self.damage)
                 for i in range(30):
-                    angle = random.random() * math.pi * 2
-                    speed = random.random() * 5
-                    self.game.state.sparks.append(Spark(self.game.player.rect().center, angle, 2 + random.random()))
-                    self.game.state.particles.append(Particle(self.game, 'particle', self.game.player.rect().center, velocity=[math.cos(angle + math.pi) * speed * 0.5, math.sin(angle + math.pi) * speed * 0.5], frame=random.randint(0, 7)))
-                print('PLAYER HIT!')
+                        angle = random.random() * math.pi * 2
+                        speed = random.random() * 5
+                        self.game.state.sparks.append(Spark(self.game.player.rect().center, angle, 2 + random.random()))
+                        self.game.state.particles.append(Particle(self.game, 'particle', self.game.player.rect().center, velocity=[math.cos(angle + math.pi) * speed * 0.5, math.sin(angle + math.pi) * speed * 0.5], frame=random.randint(0, 7)))
+                if alive:
+                    self.game.screenshake = max(8, self.game.screenshake)
+                    print(f'PLAYER HIT!\nDamage Taken:{self.damage}\nHealth Remaining:{self.game.player.health}')
+                else:
+                    self.game.state.dead += 1
+                    self.game.screenshake = max(16, self.game.screenshake)
+                    print('PLAYER KILLED!')
 
     def render(self, surf, offset=(0, 0)):
         surf.blit(self.img, 

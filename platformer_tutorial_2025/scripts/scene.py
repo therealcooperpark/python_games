@@ -45,7 +45,7 @@ class GameplayScene(Scene):
                 self.game.player.pos = spawner['pos']
                 self.game.player.air_time = 0 # Reset on respawn
             else:
-                self.enemies.append(Enemy(self.game, spawner['pos'], (8, 15), 20, 1))
+                self.enemies.append(Enemy(self.game, spawner['pos'], (8, 15), 20, 10))
         
         # Reset other entity collections
         self.projectiles = []
