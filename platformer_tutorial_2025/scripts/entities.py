@@ -131,7 +131,7 @@ class Enemy(PhysicsEntity):
                 self.game.sfx['hit'].play()
                 alive = self.take_damage(self.game.player.damage)
                 if alive:
-                    print(f'ENEMY HIT:\nDamage taken: {self.game.player.damage}\nRemaining health: {self.health}')
+                    print(f'ENEMY HIT!\nDamage taken: {self.game.player.damage}\nRemaining health: {self.health}')
                     self.iframes += self.i_window
                     for i in range(30):
                         angle = random.random() * math.pi * 2
@@ -182,6 +182,9 @@ class Player(PhysicsEntity):
 
     def update(self, tilemap, movement=(0, 0)):
         super().update(tilemap, movement=movement)
+
+        # Process iframes
+        self.iframes = max(0, self.iframes - 1)
         
         # Reset jump
         self.air_time += 1

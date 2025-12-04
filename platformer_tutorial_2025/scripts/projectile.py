@@ -1,5 +1,4 @@
 import math
-import pygame
 from scripts.particle import Particle
 from scripts.spark import Spark
 import random
@@ -27,19 +26,19 @@ class Projectile():
                 self.game.state.sparks.append(Spark(self.pos, random.random() - 0.5 + (math.pi if self.direction > 0 else 0), 2 + random.random()))
         elif self.timer > 360: # Time out the projectile
             self.game.state.projectiles.remove(self)
-        elif abs(self.game.player.dashing) < 50:
+        elif abs(self.game.player.dashing) < 50 and self.game.player.iframes == 0:
             if self.game.player.rect().collidepoint(self.pos):
                 self.game.state.projectiles.remove(self)
                 self.game.sfx['hit'].play()
                 alive = self.game.player.take_damage(self.damage)
                 for i in range(30):
-                        angle = random.random() * math.pi * 2
-                        speed = random.random() * 5
-                        self.game.state.sparks.append(Spark(self.game.player.rect().center, angle, 2 + random.random()))
-                        self.game.state.particles.append(Particle(self.game, 'particle', self.game.player.rect().center, velocity=[math.cos(angle + math.pi) * speed * 0.5, math.sin(angle + math.pi) * speed * 0.5], frame=random.randint(0, 7)))
+                    angle = random.random() * math.pi * 2
+                    speed = random.random() * 5
+                    self.game.state.sparks.append(Spark(self.game.player.rect().center, angle, 2 + random.random()))
+                    self.game.state.particles.append(Particle(self.game, 'particle', self.game.player.rect().center, velocity=[math.cos(angle + math.pi) * speed * 0.5, math.sin(angle + math.pi) * speed * 0.5], frame=random.randint(0, 7)))
                 if alive:
                     self.game.screenshake = max(8, self.game.screenshake)
-                    print(f'PLAYER HIT!\nDamage Taken:{self.damage}\nHealth Remaining:{self.game.player.health}')
+                    print(f'PLAYER HIT!\nDamage Taken: {self.damage}\nHealth Remaining: {self.game.player.health}')
                 else:
                     self.game.state.dead += 1
                     self.game.screenshake = max(16, self.game.screenshake)
