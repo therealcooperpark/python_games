@@ -178,10 +178,10 @@ class Game: # Manage game settings
 
     def render(self):
         if self.state.transition:
-                transition_surf = pygame.Surface(self.display.get_size())
-                pygame.draw.circle(transition_surf, (255, 255, 255), (self.display.get_width() // 2, self.display.get_height() // 2), (30 - abs(self.state.transition)) * 8)
-                transition_surf.set_colorkey((255, 255, 255))
-                self.display.blit(transition_surf, (0, 0))
+            transition_surf = pygame.Surface(self.display.get_size())
+            pygame.draw.circle(transition_surf, (255, 255, 255), (self.display.get_width() // 2, self.display.get_height() // 2), (30 - abs(self.state.transition)) * 8)
+            transition_surf.set_colorkey((255, 255, 255))
+            self.display.blit(transition_surf, (0, 0))
 
         self.display_2.blit(self.display, (0, 0))
 
