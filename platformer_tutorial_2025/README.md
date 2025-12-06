@@ -13,7 +13,7 @@ Following along with the platformer tutorial found here - https://www.youtube.co
 Run `poetry run pyinstaller game.py --noconsole` to compile the game for sharing. Only works on Linux because that's how pyinstaller works.
 
 ## Personal next steps:
-1. Implement Health / Damage instead of insta-kill hits
+1. :white_check_mark: Implement Health / Damage instead of insta-kill hits
     - Add health to Player and Enemies
     - Add damage to dash and projectiles
 
@@ -45,3 +45,4 @@ Run `poetry run pyinstaller game.py --noconsole` to compile the game for sharing
     - Minimap UI?
     - New Enemy w/ Asset
     - Talent or Powerup system?
+    - Damage number pop-ups on damaged entities?
