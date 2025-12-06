@@ -19,7 +19,10 @@ Run `poetry run pyinstaller game.py --noconsole` to compile the game for sharing
 
 2. Make map transition system
     - Start with travelling to a location after all enemies are dead to move on
-    - Move travel position to "end of map" and alter requirements for it
+        - COMPLETE
+    - Turn the transition space into its own tile type and formalize the logic for it
+    - Move travel position to "end of map"
+    - Change transition screen to swipe instead of circle
 
 3. Improve maps
     - Use the level editor to build larger map with more complexity
