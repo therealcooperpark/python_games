@@ -37,6 +37,7 @@ class Game: # Manage game settings
             'player' : load_image('entities/player.png'),
             'background' : load_image('background.png'),
             'clouds': load_images('clouds'),
+            'spawners': load_images('tiles/spawners'),
             'enemy/idle': Animation(load_images('entities/enemy/idle'), img_dur=6),
             'enemy/run': Animation(load_images('entities/enemy/run'), img_dur=4),
             'player/idle': Animation(load_images('entities/player/idle'), img_dur=6),
@@ -85,14 +86,6 @@ class Game: # Manage game settings
 
         self.screenshake = max(0, self.screenshake - 1)
 
-        if not len(self.state.enemies):
-            self.state.transition += 1
-            if self.state.transition > 30:
-                self.state.level = min(self.state.level + 1, len(os.listdir('data/maps')) - 1)
-                self.state.load_level(self.state.level)
-        if self.state.transition < 0:
-            self.state.transition += 1
-
         if self.state.dead: # You died, start over in 40 frames
             self.state.dead += 1
             if self.state.dead >= 10:
@@ -113,6 +106,23 @@ class Game: # Manage game settings
         self.clouds.render(self.display_2, offset=render_scroll)
 
         self.tilemap.render(self.display, offset=render_scroll)
+
+        if len(self.state.enemies) == 0: # All enemies defeated, unlock next room
+            asset = self.assets['spawners'][0].fill((127, 0, 255))
+            self.display.blit(self.assets['spawners'][0],
+                (self.state.transition_loc[0] - render_scroll[0],
+                 self.state.transition_loc[1] - render_scroll[1])  
+            )
+
+            if self.player.rect().colliderect(self.state.transition_loc):
+                self.state.transition += 1
+
+            if self.state.transition > 30:
+                self.state.level = min(self.state.level + 1, len(os.listdir('data/maps')) - 1)
+                self.state.load_level(self.state.level)
+
+        if self.state.transition < 0: # Open up the transition circle
+            self.state.transition += 1
 
         for enemy in self.state.enemies.copy():
             kill = enemy.update(self.tilemap, (0, 0))
@@ -179,7 +189,11 @@ class Game: # Manage game settings
     def render(self):
         if self.state.transition:
             transition_surf = pygame.Surface(self.display.get_size())
-            pygame.draw.circle(transition_surf, (255, 255, 255), (self.display.get_width() // 2, self.display.get_height() // 2), (30 - abs(self.state.transition)) * 8)
+            pygame.draw.circle(transition_surf, 
+                (255, 255, 255), 
+                (self.display.get_width() // 2, self.display.get_height() // 2), 
+                (30 - abs(self.state.transition)) * 8
+            )
             transition_surf.set_colorkey((255, 255, 255))
             self.display.blit(transition_surf, (0, 0))
 

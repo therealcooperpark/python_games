@@ -38,6 +38,7 @@ Run `poetry run pyinstaller game.py --noconsole` to compile the game for sharing
 6. Design the Boss in game
 
 7. Consider miscellaneous improvements
+    - New jump audio
     - Proper pause menu with:
         - Reset Fight
         - Quit

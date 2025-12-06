@@ -25,7 +25,7 @@ class GameplayScene(Scene):
     def __init__(self, game, level):
         super().__init__(game)
         self.level = level
-
+        self.transition_loc = None # To be filled with a pygame rect
     def load_level(self, map_id):
         '''
         Reset the game on the given level (map_id)
@@ -42,10 +42,14 @@ class GameplayScene(Scene):
         self.enemies = []
         for spawner in self.game.tilemap.extract([('spawners', 0), ('spawners', 1)]):
             if spawner['variant'] == 0: # Player variant
-                self.game.player.pos = spawner['pos']
+                # Spawn player
+                self.game.player.pos = list(spawner['pos'])
                 self.game.player.air_time = 0 # Reset on respawn
+                
+                # Load transition location
+                self.transition_loc = pygame.Rect(spawner['pos'][0], spawner['pos'][1], spawner['pos'][0] * self.game.tilemap.tile_size, spawner['pos'][1] * self.game.tilemap.tile_size)
             else:
-                self.enemies.append(Enemy(self.game, spawner['pos'], (8, 15), 20, 10))
+                self.enemies.append(Enemy(self.game, spawner['pos'], (8, 15), 0, 10))
         
         # Reset other entity collections
         self.projectiles = []
