@@ -23,7 +23,7 @@ class Game: # Manage game settings
 
         self.clock = pygame.time.Clock() # Used to force the game to run at X FPS
 
-        self.movement = [False, False] # Used to track movement triggers by the player
+        #self.movement = [False, False] # Used to track movement triggers by the player
 
         self.assets = {
             'decor' : load_images('tiles/decor'),
@@ -133,9 +133,9 @@ class Game: # Manage game settings
         #     if kill:
         #         self.state.enemies.remove(enemy)
 
-        if not self.state.dead:
-            self.player.update(self.state.tilemap, (self.movement[1] - self.movement[0], 0))
-            self.player.render(self.display, offset=self.scroll)
+        # if not self.state.dead:
+        #     self.player.update(self.state.tilemap, (self.movement[1] - self.movement[0], 0))
+        #     self.player.render(self.display, offset=self.scroll)
 
         for spark in self.state.sparks.copy():
             kill = spark.update()
@@ -172,9 +172,9 @@ class Game: # Manage game settings
                 sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
-                    self.movement[0] = True
+                    self.state.movement[0] = True
                 if event.key == pygame.K_RIGHT:
-                    self.movement[1] = True
+                    self.state.movement[1] = True
                 if event.key == pygame.K_UP:
                     if self.player.jump():
                         self.sfx['jump'].play()
@@ -182,12 +182,12 @@ class Game: # Manage game settings
                     self.player.dash()
                 if event.key == pygame.K_ESCAPE:
                     self.is_paused = not self.is_paused
-                    self.movement = [False, False]
+                    self.state.movement = [False, False]
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
-                    self.movement[0] = False
+                    self.state.movement[0] = False
                 if event.key == pygame.K_RIGHT:
-                    self.movement[1] = False
+                    self.state.movement[1] = False
 
     def render(self):
         if self.state.transition:

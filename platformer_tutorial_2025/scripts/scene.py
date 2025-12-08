@@ -37,6 +37,9 @@ class GameplayScene(Scene):
         self.clouds = Clouds(self.game.assets['clouds'], count=16)
         self.tilemap = Tilemap(self.game, tile_size=16)
 
+        # Level stuff
+        self.movement = [False, False] # Used to track movement triggers by the player
+
     def load_level(self, map_id):
         '''
         Reset the game on the given level (map_id)
@@ -99,6 +102,10 @@ class GameplayScene(Scene):
             if kill:
                 self.enemies.remove(enemy)
 
+        # Check Player death
+        if not self.dead:
+            self.game.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
+
     def render(self, offset=(0, 0)):
 
         # Background
@@ -118,6 +125,10 @@ class GameplayScene(Scene):
         # Enemies
         for enemy in self.enemies:
             enemy.render(self.game.display, offset=offset)
+        
+        # Player
+        if not self.dead:
+            self.game.player.render(self.game.display, offset=offset)
     
 
 class PauseScene(Scene):
