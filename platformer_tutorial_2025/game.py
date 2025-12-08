@@ -2,7 +2,7 @@ import pygame
 import math
 import os
 import random
-from scripts.clouds import Cloud, Clouds
+#from scripts.clouds import Cloud, Clouds
 from scripts.entities import Enemy, PhysicsEntity, Player
 from scripts.particle import Particle
 from scripts.scene import Scene, GameplayScene, PauseScene
@@ -22,10 +22,6 @@ class Game: # Manage game settings
         self.display_2 = pygame.Surface((320, 240)) # For content that should have outline
 
         self.clock = pygame.time.Clock() # Used to force the game to run at X FPS
-
-        self.state = GameplayScene(self, 0)
-        self.pause_state = PauseScene(self)
-        self.is_paused = False
 
         self.movement = [False, False] # Used to track movement triggers by the player
 
@@ -67,13 +63,16 @@ class Game: # Manage game settings
         self.sfx['dash'].set_volume(0.3)
         self.sfx['jump'].set_volume(0.7)
 
-        self.clouds = Clouds(self.assets['clouds'], count=16)
-
+        self.state = GameplayScene(self, 0)
+        self.pause_state = PauseScene(self)
+        self.is_paused = False
+        
         self.player = Player(self, (50, 50), (8, 15), health=30)
 
         self.tilemap = Tilemap(self, tile_size=16)
         
         self.state.load_level(self.state.level)
+        
 
         self.screenshake = 0
 
@@ -102,8 +101,10 @@ class Game: # Manage game settings
                 pos = (rect.x + random.random() * rect.width, rect.y + random.random() * rect.height)
                 self.state.particles.append(Particle(self, 'leaf', pos, velocity=[-0.1, 0.3], frame=random.randint(0, 20)))
 
-        self.clouds.update()
-        self.clouds.render(self.display_2, offset=render_scroll)
+        #self.clouds.update()
+        #self.clouds.render(self.display_2, offset=render_scroll)
+        self.state.update()
+        self.state.render(render_scroll)
 
         self.tilemap.render(self.display, offset=render_scroll)
 

@@ -1,4 +1,5 @@
 import pygame
+from scripts.clouds import Cloud, Clouds
 from scripts.entities import Enemy
 import sys
 
@@ -26,6 +27,9 @@ class GameplayScene(Scene):
         super().__init__(game)
         self.level = level
         self.transition_loc = None # To be filled with a pygame rect
+
+        self.clouds = Clouds(self.game.assets['clouds'], count=16)
+
     def load_level(self, map_id):
         '''
         Reset the game on the given level (map_id)
@@ -60,6 +64,12 @@ class GameplayScene(Scene):
         self.dead = 0 # Number boolean for if player is dead
         self.transition = -30 # Transition speed when moving to a new level
         self.game.scroll = [0, 0] # Offset which emulates a "camera" experience
+
+    def update(self):
+        self.clouds.update()
+
+    def render(self, offset=(0, 0)):
+        self.clouds.render(self.game.display_2, offset=offset)
 
     
 
