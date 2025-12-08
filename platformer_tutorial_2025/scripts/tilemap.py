@@ -21,7 +21,7 @@ AUTOTILE_TYPES = {'grass', 'stone'}
 
 class Tilemap:
     def __init__(self, game, tile_size=16):
-        self.game = game
+        self.game = game # Needed to pull assets
         self.tile_size = tile_size
         self.tilemap = {} # Tracking all of the organized tiles that make up the map. Each tile is mapped using location as a key. Tiles without a map are assumed to be "empty space"
         self.offgrid_tiles = [] # Tracking non-grid tiles. Components of this are the same as tilemap objects, but their position is calculated by pixel, not tile.

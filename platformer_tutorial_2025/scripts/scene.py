@@ -1,6 +1,7 @@
 import pygame
 from scripts.clouds import Cloud, Clouds
 from scripts.entities import Enemy
+from scripts.tilemap import Tilemap
 import sys
 
 class Scene:
@@ -29,29 +30,30 @@ class GameplayScene(Scene):
         self.transition_loc = None # To be filled with a pygame rect
 
         self.clouds = Clouds(self.game.assets['clouds'], count=16)
+        self.tilemap = Tilemap(self.game, tile_size=16)
 
     def load_level(self, map_id):
         '''
         Reset the game on the given level (map_id)
         '''
         # Load map
-        self.game.tilemap.load('data/maps/' + str(map_id) + '.json')
+        self.tilemap.load('data/maps/' + str(map_id) + '.json')
 
         # Handle leaf spawners
         self.leaf_spawners = []
-        for tree in self.game.tilemap.extract([('large_decor', 2)], keep=True):
+        for tree in self.tilemap.extract([('large_decor', 2)], keep=True):
             self.leaf_spawners.append(pygame.Rect(4 + tree['pos'][0], 4 + tree['pos'][1], 23, 13)) # Offset by 4 pixels for leaf falling. Numbers based on tree img size
 
         # Handle original Player/Enemy Spawners
         self.enemies = []
-        for spawner in self.game.tilemap.extract([('spawners', 0), ('spawners', 1)]):
+        for spawner in self.tilemap.extract([('spawners', 0), ('spawners', 1)]):
             if spawner['variant'] == 0: # Player variant
                 # Spawn player
                 self.game.player.pos = list(spawner['pos'])
                 self.game.player.air_time = 0 # Reset on respawn
                 
                 # Load transition location
-                self.transition_loc = pygame.Rect(spawner['pos'][0], spawner['pos'][1], spawner['pos'][0] * self.game.tilemap.tile_size, spawner['pos'][1] * self.game.tilemap.tile_size)
+                self.transition_loc = pygame.Rect(spawner['pos'][0], spawner['pos'][1], spawner['pos'][0] * self.tilemap.tile_size, spawner['pos'][1] * self.tilemap.tile_size)
             else:
                 self.enemies.append(Enemy(self.game, spawner['pos'], (8, 15), 0, 10))
         
@@ -70,6 +72,8 @@ class GameplayScene(Scene):
 
     def render(self, offset=(0, 0)):
         self.clouds.render(self.game.display_2, offset=offset)
+
+        self.tilemap.render(self.game.display, offset=offset)
 
     
 

@@ -8,7 +8,7 @@ from scripts.particle import Particle
 from scripts.scene import Scene, GameplayScene, PauseScene
 from scripts.spark import Spark
 from scripts.utils import load_image, load_images, Animation
-from scripts.tilemap import Tilemap
+#from scripts.tilemap import Tilemap
 import sys
 
 class Game: # Manage game settings
@@ -69,7 +69,7 @@ class Game: # Manage game settings
         
         self.player = Player(self, (50, 50), (8, 15), health=30)
 
-        self.tilemap = Tilemap(self, tile_size=16)
+        #self.tilemap = Tilemap(self, tile_size=16)
         
         self.state.load_level(self.state.level)
         
@@ -103,10 +103,12 @@ class Game: # Manage game settings
 
         #self.clouds.update()
         #self.clouds.render(self.display_2, offset=render_scroll)
+
+        #self.tilemap.render(self.display, offset=render_scroll)
+
         self.state.update()
         self.state.render(render_scroll)
 
-        self.tilemap.render(self.display, offset=render_scroll)
 
         if len(self.state.enemies) == 0: # All enemies defeated, unlock next room
             asset = self.assets['spawners'][0].fill((127, 0, 255))
@@ -126,13 +128,13 @@ class Game: # Manage game settings
             self.state.transition += 1
 
         for enemy in self.state.enemies.copy():
-            kill = enemy.update(self.tilemap, (0, 0))
+            kill = enemy.update(self.state.tilemap, (0, 0))
             enemy.render(self.display, offset=render_scroll)
             if kill:
                 self.state.enemies.remove(enemy)
 
         if not self.state.dead:
-            self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
+            self.player.update(self.state.tilemap, (self.movement[1] - self.movement[0], 0))
             self.player.render(self.display, offset=self.scroll)
 
         for spark in self.state.sparks.copy():
