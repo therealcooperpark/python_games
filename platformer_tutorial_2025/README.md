@@ -19,13 +19,7 @@ Run `poetry run pyinstaller game.py --noconsole` to compile the game for sharing
 
 2. Refactor Game vs Scene logic to improve separation of logic.
     - Examples:
-        - Player should be in Scene
-        - Level progression logic should be in scene (at least until the logic between scenes changes)
-        - Enemy killing logic (line 127) should move to scene
-        - Death should move too (Line 133?)
-        - Sparks
-        - Projectiles
-        - Particles
+        - Player should be in Scene(?)
         - Handle Input function should go to scenes
     - All renders should still go to main game display, but called from the Scene I think
     - Render should check its own transition and the Scene will alter it with its own update
