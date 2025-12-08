@@ -110,22 +110,22 @@ class Game: # Manage game settings
         self.state.render(render_scroll)
 
 
-        if len(self.state.enemies) == 0: # All enemies defeated, unlock next room
-            asset = self.assets['spawners'][0].fill((127, 0, 255))
-            self.display.blit(self.assets['spawners'][0],
-                (self.state.transition_loc[0] - render_scroll[0],
-                 self.state.transition_loc[1] - render_scroll[1])  
-            )
+        # if len(self.state.enemies) == 0: # All enemies defeated, unlock next room
+        #     asset = self.assets['spawners'][0].fill((127, 0, 255))
+        #     self.display.blit(self.assets['spawners'][0],
+        #         (self.state.transition_loc[0] - render_scroll[0],
+        #          self.state.transition_loc[1] - render_scroll[1])  
+        #     )
 
-            if self.player.rect().colliderect(self.state.transition_loc):
-                self.state.transition += 1
+        #     if self.player.rect().colliderect(self.state.transition_loc):
+        #         self.state.transition += 1
 
-            if self.state.transition > 30:
-                self.state.level = min(self.state.level + 1, len(os.listdir('data/maps')) - 1)
-                self.state.load_level(self.state.level)
+        #     if self.state.transition > 30:
+        #         self.state.level = min(self.state.level + 1, len(os.listdir('data/maps')) - 1)
+        #         self.state.load_level(self.state.level)
 
-        if self.state.transition < 0: # Open up the transition circle
-            self.state.transition += 1
+        # if self.state.transition < 0: # Open up the transition circle
+        #     self.state.transition += 1
 
         for enemy in self.state.enemies.copy():
             kill = enemy.update(self.state.tilemap, (0, 0))
@@ -152,7 +152,7 @@ class Game: # Manage game settings
         for projectile in self.state.projectiles.copy():
             projectile.move()
             projectile.render(self.display, render_scroll)
-            projectile.update()
+            projectile.update(self.state.tilemap)
 
         for particle in self.state.particles.copy():
             kill = particle.update()

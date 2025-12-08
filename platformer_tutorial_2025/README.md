@@ -19,7 +19,7 @@ Run `poetry run pyinstaller game.py --noconsole` to compile the game for sharing
 
 2. Refactor Game vs Scene logic to improve separation of logic.
     - Examples:
-        - Player / Tilemap logic all in game but probably should be in Scene
+        - Player should be in Scene
         - Level progression logic should be in scene (at least until the logic between scenes changes)
         - Enemy killing logic (line 127) should move to scene
         - Death should move too (Line 133?)

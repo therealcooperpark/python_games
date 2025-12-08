@@ -1,3 +1,4 @@
+import os
 import pygame
 from scripts.clouds import Cloud, Clouds
 from scripts.entities import Enemy
@@ -26,9 +27,13 @@ class GameplayScene(Scene):
     '''
     def __init__(self, game, level):
         super().__init__(game)
+        
+        # Metadata
         self.level = level
+        self.complete = False
         self.transition_loc = None # To be filled with a pygame rect
 
+        # Map stuff
         self.clouds = Clouds(self.game.assets['clouds'], count=16)
         self.tilemap = Tilemap(self.game, tile_size=16)
 
@@ -53,7 +58,7 @@ class GameplayScene(Scene):
                 self.game.player.air_time = 0 # Reset on respawn
                 
                 # Load transition location
-                self.transition_loc = pygame.Rect(spawner['pos'][0], spawner['pos'][1], spawner['pos'][0] * self.tilemap.tile_size, spawner['pos'][1] * self.tilemap.tile_size)
+                self.transition_loc = pygame.Rect(spawner['pos'][0], spawner['pos'][1], 8, 15)
             else:
                 self.enemies.append(Enemy(self.game, spawner['pos'], (8, 15), 0, 10))
         
@@ -64,17 +69,46 @@ class GameplayScene(Scene):
 
         # Reset values
         self.dead = 0 # Number boolean for if player is dead
+        self.complete = False
         self.transition = -30 # Transition speed when moving to a new level
         self.game.scroll = [0, 0] # Offset which emulates a "camera" experience
 
     def update(self):
+
+        # Update background
         self.clouds.update()
 
+        # Check for progression to next level
+        if len(self.enemies) == 0: # All enemies defeated, unlock next room
+            self.complete = True
+            print(f'Player: {self.game.player.rect()}\nTransitioner: {self.transition_loc}')
+
+            if self.game.player.rect().colliderect(self.transition_loc): # Start the countdown to new level
+                self.transition += 1
+
+            if self.transition > 30: # Trigger the new level load
+                self.level = min(self.level + 1, len(os.listdir('data/maps')) - 1)
+                self.load_level(self.level)
+        
+        # Opens the transition effect back up
+        if self.transition < 0:
+            self.transition += 1
+
     def render(self, offset=(0, 0)):
+
+        # Render background
         self.clouds.render(self.game.display_2, offset=offset)
 
+        # Render tilemap
         self.tilemap.render(self.game.display, offset=offset)
 
+        # Render special conditions
+        if self.complete:
+            asset = self.game.assets['spawners'][0].fill((127, 0, 255))
+            self.game.display.blit(self.game.assets['spawners'][0],
+                (self.transition_loc[0] - offset[0],
+                 self.transition_loc[1] - offset[1])  
+            )
     
 
 class PauseScene(Scene):
