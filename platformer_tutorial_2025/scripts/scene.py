@@ -106,6 +106,12 @@ class GameplayScene(Scene):
         if not self.dead:
             self.game.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
 
+        # Resolve sparks
+        for spark in self.sparks.copy():
+            kill = spark.update()
+            if kill:
+                self.sparks.remove(spark)
+
     def render(self, offset=(0, 0)):
 
         # Background
@@ -129,6 +135,10 @@ class GameplayScene(Scene):
         # Player
         if not self.dead:
             self.game.player.render(self.game.display, offset=offset)
+
+        # Sparks
+        for spark in self.sparks:
+            spark.render(self.game.display, offset=offset)
     
 
 class PauseScene(Scene):
