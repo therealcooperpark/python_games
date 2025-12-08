@@ -1,7 +1,10 @@
+import math
 import os
 import pygame
 from scripts.clouds import Cloud, Clouds
 from scripts.entities import Enemy
+from scripts.particle import Particle
+from scripts.spark import Spark
 from scripts.tilemap import Tilemap
 import sys
 
@@ -71,6 +74,7 @@ class GameplayScene(Scene):
         self.sparks = []
 
         # Reset values
+        self.game.player.health = self.game.player.max_health
         self.dead = 0 # Number boolean for if player is dead
         self.complete = False
         self.transition = -30 # Transition speed when moving to a new level
@@ -111,9 +115,21 @@ class GameplayScene(Scene):
             kill = spark.update()
             if kill:
                 self.sparks.remove(spark)
+        
+        # Resolve Projectiles
+        for projectile in self.projectiles.copy():
+            projectile.move() # TODO: Consider putting move in update
+            projectile.update(self.tilemap)
+
+        # Resolve Particles
+        for particle in self.particles.copy():
+            kill = particle.update()
+            if particle.type == 'leaf':
+                particle.pos[0] += math.sin(particle.animation.frame * 0.035) * 0.3 # Put a wobble on the leaf fall with a sin wave
+            if kill:
+                self.particles.remove(particle)
 
     def render(self, offset=(0, 0)):
-
         # Background
         self.clouds.render(self.game.display_2, offset=offset)
 
@@ -139,6 +155,14 @@ class GameplayScene(Scene):
         # Sparks
         for spark in self.sparks:
             spark.render(self.game.display, offset=offset)
+
+        # Projectiles
+        for projectile in self.projectiles:
+            projectile.render(self.game.display, offset=offset)
+
+        # Particles
+        for particle in self.particles:
+            particle.render(self.game.display, offset=offset)
     
 
 class PauseScene(Scene):

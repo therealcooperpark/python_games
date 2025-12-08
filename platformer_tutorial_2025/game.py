@@ -137,11 +137,11 @@ class Game: # Manage game settings
         #     self.player.update(self.state.tilemap, (self.movement[1] - self.movement[0], 0))
         #     self.player.render(self.display, offset=self.scroll)
 
-        for spark in self.state.sparks.copy():
-            kill = spark.update()
-            spark.render(self.display, offset=render_scroll)
-            if kill:
-                self.state.sparks.remove(spark)
+        # for spark in self.state.sparks.copy():
+        #     kill = spark.update()
+        #     spark.render(self.display, offset=render_scroll)
+        #     if kill:
+        #         self.state.sparks.remove(spark)
 
         # Handle outlining
         display_mask = pygame.mask.from_surface(self.display)
@@ -149,18 +149,18 @@ class Game: # Manage game settings
         for offset in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
             self.display_2.blit(display_sillhouette, offset)
 
-        for projectile in self.state.projectiles.copy():
-            projectile.move()
-            projectile.render(self.display, render_scroll)
-            projectile.update(self.state.tilemap)
+        # for projectile in self.state.projectiles.copy():
+        #     projectile.move()
+        #     projectile.render(self.display, render_scroll)
+        #     projectile.update(self.state.tilemap)
 
-        for particle in self.state.particles.copy():
-            kill = particle.update()
-            particle.render(self.display, offset=render_scroll)
-            if particle.type == 'leaf':
-                particle.pos[0] += math.sin(particle.animation.frame * 0.035) * 0.3 # Put a wobble on the leaf fall with a sin wave
-            if kill:
-                self.state.particles.remove(particle)
+        # for particle in self.state.particles.copy():
+        #     kill = particle.update()
+        #     particle.render(self.display, offset=render_scroll)
+        #     if particle.type == 'leaf':
+        #         particle.pos[0] += math.sin(particle.animation.frame * 0.035) * 0.3 # Put a wobble on the leaf fall with a sin wave
+        #     if kill:
+        #         self.state.particles.remove(particle)
 
     def handle_input(self):
         '''
