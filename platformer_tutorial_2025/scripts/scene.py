@@ -74,8 +74,11 @@ class GameplayScene(Scene):
         self.game.scroll = [0, 0] # Offset which emulates a "camera" experience
 
     def update(self):
+        # Finish load level animation
+        if self.transition < 0:
+            self.transition += 1
 
-        # Update background
+        # Background assets
         self.clouds.update()
 
         # Check for progression to next level
@@ -89,26 +92,32 @@ class GameplayScene(Scene):
             if self.transition > 30: # Trigger the new level load
                 self.level = min(self.level + 1, len(os.listdir('data/maps')) - 1)
                 self.load_level(self.level)
-        
-        # Opens the transition effect back up
-        if self.transition < 0:
-            self.transition += 1
+
+        # Handle enemies
+        for enemy in self.enemies.copy():
+            kill = enemy.update(self.tilemap, (0, 0))
+            if kill:
+                self.enemies.remove(enemy)
 
     def render(self, offset=(0, 0)):
 
-        # Render background
+        # Background
         self.clouds.render(self.game.display_2, offset=offset)
 
-        # Render tilemap
+        # Tilemap
         self.tilemap.render(self.game.display, offset=offset)
 
-        # Render special conditions
+        # Special conditions
         if self.complete:
             asset = self.game.assets['spawners'][0].fill((127, 0, 255))
             self.game.display.blit(self.game.assets['spawners'][0],
                 (self.transition_loc[0] - offset[0],
                  self.transition_loc[1] - offset[1])  
             )
+
+        # Enemies
+        for enemy in self.enemies:
+            enemy.render(self.game.display, offset=offset)
     
 
 class PauseScene(Scene):

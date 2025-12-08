@@ -127,11 +127,11 @@ class Game: # Manage game settings
         # if self.state.transition < 0: # Open up the transition circle
         #     self.state.transition += 1
 
-        for enemy in self.state.enemies.copy():
-            kill = enemy.update(self.state.tilemap, (0, 0))
-            enemy.render(self.display, offset=render_scroll)
-            if kill:
-                self.state.enemies.remove(enemy)
+        # for enemy in self.state.enemies.copy():
+        #     kill = enemy.update(self.state.tilemap, (0, 0))
+        #     enemy.render(self.display, offset=render_scroll)
+        #     if kill:
+        #         self.state.enemies.remove(enemy)
 
         if not self.state.dead:
             self.player.update(self.state.tilemap, (self.movement[1] - self.movement[0], 0))
