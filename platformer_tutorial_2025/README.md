@@ -18,10 +18,6 @@ Run `poetry run pyinstaller game.py --noconsole` to compile the game for sharing
     - Add damage to dash and projectiles
 
 2. Refactor Game vs Scene logic to improve separation of logic.
-    - Examples:
-        - Player should be in Scene(?)
-        - Handle Input function should go to scenes
-    - All renders should still go to main game display, but called from the Scene I think
     - Render should check its own transition and the Scene will alter it with its own update
         - This sets us up for #3 where the transition affect can be triggered by different settings (death, touching transitioner, etc.)
 

@@ -102,9 +102,9 @@ class GameplayScene(Scene):
             if self.game.player.rect().colliderect(self.transition_loc): # Start the countdown to new level
                 self.transition += 1
 
-            if self.transition > 30: # Trigger the new level load
-                self.level = min(self.level + 1, len(os.listdir('data/maps')) - 1)
-                self.load_level(self.level)
+                if self.transition > 30: # Trigger the new level load, only when standing on transitioner
+                    self.level = min(self.level + 1, len(os.listdir('data/maps')) - 1)
+                    self.load_level(self.level)
 
         # Handle enemies
         for enemy in self.enemies.copy():
@@ -116,9 +116,9 @@ class GameplayScene(Scene):
         if self.dead: # You died, start over in 40 frames
             self.dead += 1
             if self.dead >= 10:
-                self.transition = min(30, self.state.transition + 1)
+                self.transition = min(30, self.transition + 1)
             if self.dead > 40:
-                self.load_level(self.state.level)
+                self.load_level(self.level)
         else: # Update as usual and continue
             self.game.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
 
