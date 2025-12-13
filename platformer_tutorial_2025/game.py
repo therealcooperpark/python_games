@@ -30,6 +30,7 @@ class Game: # Manage game settings
             'background' : load_image('background.png'),
             'clouds': load_images('clouds'),
             'spawners': load_images('tiles/spawners'),
+            'transitioner': load_images('tiles/transitioner'),
             'enemy/idle': Animation(load_images('entities/enemy/idle'), img_dur=6),
             'enemy/run': Animation(load_images('entities/enemy/run'), img_dur=4),
             'player/idle': Animation(load_images('entities/player/idle'), img_dur=6),

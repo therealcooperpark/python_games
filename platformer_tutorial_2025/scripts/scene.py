@@ -7,6 +7,7 @@ from scripts.entities import Enemy
 from scripts.particle import Particle
 from scripts.spark import Spark
 from scripts.tilemap import Tilemap
+from scripts.transitioner import Transitioner
 import sys
 
 class Scene:
@@ -35,7 +36,6 @@ class GameplayScene(Scene):
         # Metadata
         self.level = level
         self.complete = False
-        self.transition_loc = None # To be filled with a pygame rect
 
         # Map stuff
         self.clouds = Clouds(self.game.assets['clouds'], count=16)
@@ -69,6 +69,11 @@ class GameplayScene(Scene):
             else:
                 self.enemies.append(Enemy(self.game, spawner['pos'], (8, 15), 10, 10))
         
+        # Obtain Transitioners
+        self.transitioners = []
+        for tile in self.tilemap.extract([('transitioner', 0)]):
+            self.transitioners.append(Transitioner(self.game, tile['pos'], (8, 15), self.level + 1))
+        
         # Reset other entity collections
         self.projectiles = []
         self.particles = []
@@ -98,7 +103,7 @@ class GameplayScene(Scene):
         if len(self.enemies) == 0: # All enemies defeated, unlock next room
             self.complete = True
 
-            if self.game.player.rect().colliderect(self.transition_loc): # Start the countdown to new level
+            if self.game.player.rect().collidelistall(self.transitioners): # Start the countdown to new level
                 self.transition += 1
 
                 if self.transition > 30: # Trigger the new level load, only when standing on transitioner
@@ -149,12 +154,11 @@ class GameplayScene(Scene):
 
         # Special conditions
         if self.complete:
-            asset = self.game.assets['spawners'][0].copy()
-            asset.fill((127, 0, 255))
-            self.game.display.blit(asset,
-                (self.transition_loc[0] - offset[0],
-                 self.transition_loc[1] - offset[1])  
-            )
+            for tile in self.transitioners:
+                self.game.display.blit(tile.img,
+                    (tile.pos[0] - offset[0],
+                    tile.pos[1] - offset[1])  
+                )
 
         # Enemies
         for enemy in self.enemies:

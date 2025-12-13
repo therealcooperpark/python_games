@@ -17,37 +17,31 @@ Run `poetry run pyinstaller game.py --noconsole` to compile the game for sharing
     - Add health to Player and Enemies
     - Add damage to dash and projectiles
 
-2. Refactor Game vs Scene logic to improve separation of logic.
+2. :white_check_mark: Refactor Game vs Scene logic to improve separation of logic.
     - Added Scene and moved majority of level-specific game logic there
     - Game object now handles high-level logic and Scene can alter between levels
 
-3. Refactor Level Editor
+3. :white_check_mark: Make map transition system
+    - Added Transitioner Class to handle special tiles
+    - Added support for multiple locations
 
-4. Make map transition system
-    - Start with travelling to a location after all enemies are dead to move on
-        - COMPLETE
-    - Turn the transition space into its own tile type and formalize the logic for it
-        - Need to distinguish loading a new level from the actual graphic change of the transition.
-    - Move travel position to "end of map"
-    - Change transition screen to swipe instead of circle
-
-5. Improve maps
+4. Improve maps
     - Use the level editor to build larger map with more complexity
     - Make a "Boss Room" level for future use
     - Consider updating the level editor
 
-6. Make a "Special Attack" for Player
+5. Make a "Special Attack" for Player
     - Re-use Projectile Class
     - Earn on X kills
     - Add a UI element to show it's progress
 
-7. Make a couple assets to fill out the game
+6. Make a couple assets to fill out the game
     - Special Attack Projectile
     - "Final" Boss
 
-8. Design the Boss in game
+7. Design the Boss in game
 
-9. Consider miscellaneous improvements
+8. Consider miscellaneous improvements
     - New jump audio
     - Proper pause menu with:
         - Reset Fight

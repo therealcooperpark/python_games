@@ -3,7 +3,7 @@ A game level editor leveraging many of the same resources that are called in gam
 '''
 
 import pygame
-from scripts.utils import load_images
+from scripts.utils import load_image, load_images
 from scripts.tilemap import Tilemap
 import sys
 
@@ -26,6 +26,7 @@ class Editor: # Manage game settings
             'large_decor' : load_images('tiles/large_decor'),
             'stone' : load_images('tiles/stone'),
             'spawners': load_images('tiles/spawners'),
+            'transitioner': load_images('tiles/transitioner')
         }
 
         self.movement = [False, False, False, False] # Used to track movement of camera
