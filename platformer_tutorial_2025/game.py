@@ -23,8 +23,6 @@ class Game: # Manage game settings
 
         self.clock = pygame.time.Clock() # Used to force the game to run at X FPS
 
-        #self.movement = [False, False] # Used to track movement triggers by the player
-
         self.assets = {
             'decor' : load_images('tiles/decor'),
             'grass' : load_images('tiles/grass'),
@@ -48,7 +46,6 @@ class Game: # Manage game settings
         }
 
         # Setting sound affects
-        print(pygame.mixer.get_init())
         self.sfx = {
             'jump': pygame.mixer.Sound('data/sfx/jump.wav'),
             'dash': pygame.mixer.Sound('data/sfx/dash.wav'),
@@ -66,101 +63,51 @@ class Game: # Manage game settings
         self.state = GameplayScene(self, 0)
         self.pause_state = PauseScene(self)
         self.is_paused = False
+        self.screenshake = 0
         
         self.player = Player(self, (50, 50), (8, 15), health=30)
-
-        #self.tilemap = Tilemap(self, tile_size=16)
-        
+    
         self.state.load_level(self.state.level)
-        
-
-        self.screenshake = 0
+    
 
     def update(self):
         '''
         Handle per-frame logic updates
         '''
+
+        # Add basic background fill and asset
         self.display.fill((0, 0, 0, 0))
         self.display_2.blit(self.assets['background'], (0, 0)) # Default screen background
 
+        # Update Screenshake
         self.screenshake = max(0, self.screenshake - 1)
 
-        if self.state.dead: # You died, start over in 40 frames
-            self.state.dead += 1
-            if self.state.dead >= 10:
-                self.state.transition = min(30, self.state.transition + 1)
-            if self.state.dead > 40:
-                self.state.load_level(self.state.level)
+        # if self.state.dead: # You died, start over in 40 frames
+        #     self.state.dead += 1
+        #     if self.state.dead >= 10:
+        #         self.state.transition = min(30, self.state.transition + 1)
+        #     if self.state.dead > 40:
+        #         self.state.load_level(self.state.level)
 
+
+        # Calculate camera position and offset for future object placement
         self.scroll[0] += (self.player.rect().centerx - self.display.get_width() / 2 - self.scroll[0]) / 30 # The camera position is the top-left. So we need to subtract the screen size to center the player
         self.scroll[1] += (self.player.rect().centery - self.display.get_height() / 2 - self.scroll[1]) / 30 # The camera position is the top-left. So we need to subtract the screen size to center the player
         render_scroll = (int(self.scroll[0]), int(self.scroll[1])) # Solves sub-pixel camera jittering by using int rounding/truncation
 
-        for rect in self.state.leaf_spawners:
-            if random.random() * 49999 < rect.width * rect.height: # Control spawn rate in relation to the size of the tree
-                pos = (rect.x + random.random() * rect.width, rect.y + random.random() * rect.height)
-                self.state.particles.append(Particle(self, 'leaf', pos, velocity=[-0.1, 0.3], frame=random.randint(0, 20)))
-
-        #self.clouds.update()
-        #self.clouds.render(self.display_2, offset=render_scroll)
-
-        #self.tilemap.render(self.display, offset=render_scroll)
+        # for rect in self.state.leaf_spawners:
+        #     if random.random() * 49999 < rect.width * rect.height: # Control spawn rate in relation to the size of the tree
+        #         pos = (rect.x + random.random() * rect.width, rect.y + random.random() * rect.height)
+        #         self.state.particles.append(Particle(self, 'leaf', pos, velocity=[-0.1, 0.3], frame=random.randint(0, 20)))
 
         self.state.update()
         self.state.render(render_scroll)
-
-
-        # if len(self.state.enemies) == 0: # All enemies defeated, unlock next room
-        #     asset = self.assets['spawners'][0].fill((127, 0, 255))
-        #     self.display.blit(self.assets['spawners'][0],
-        #         (self.state.transition_loc[0] - render_scroll[0],
-        #          self.state.transition_loc[1] - render_scroll[1])  
-        #     )
-
-        #     if self.player.rect().colliderect(self.state.transition_loc):
-        #         self.state.transition += 1
-
-        #     if self.state.transition > 30:
-        #         self.state.level = min(self.state.level + 1, len(os.listdir('data/maps')) - 1)
-        #         self.state.load_level(self.state.level)
-
-        # if self.state.transition < 0: # Open up the transition circle
-        #     self.state.transition += 1
-
-        # for enemy in self.state.enemies.copy():
-        #     kill = enemy.update(self.state.tilemap, (0, 0))
-        #     enemy.render(self.display, offset=render_scroll)
-        #     if kill:
-        #         self.state.enemies.remove(enemy)
-
-        # if not self.state.dead:
-        #     self.player.update(self.state.tilemap, (self.movement[1] - self.movement[0], 0))
-        #     self.player.render(self.display, offset=self.scroll)
-
-        # for spark in self.state.sparks.copy():
-        #     kill = spark.update()
-        #     spark.render(self.display, offset=render_scroll)
-        #     if kill:
-        #         self.state.sparks.remove(spark)
 
         # Handle outlining
         display_mask = pygame.mask.from_surface(self.display)
         display_sillhouette = display_mask.to_surface(setcolor=(0, 0, 0, 180), unsetcolor = (0, 0, 0, 0))
         for offset in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
             self.display_2.blit(display_sillhouette, offset)
-
-        # for projectile in self.state.projectiles.copy():
-        #     projectile.move()
-        #     projectile.render(self.display, render_scroll)
-        #     projectile.update(self.state.tilemap)
-
-        # for particle in self.state.particles.copy():
-        #     kill = particle.update()
-        #     particle.render(self.display, offset=render_scroll)
-        #     if particle.type == 'leaf':
-        #         particle.pos[0] += math.sin(particle.animation.frame * 0.035) * 0.3 # Put a wobble on the leaf fall with a sin wave
-        #     if kill:
-        #         self.state.particles.remove(particle)
 
     def handle_input(self):
         '''
@@ -181,7 +128,7 @@ class Game: # Manage game settings
                 if event.key == pygame.K_x:
                     self.player.dash()
                 if event.key == pygame.K_ESCAPE:
-                    self.is_paused = not self.is_paused
+                    self.pause_state.pause()
                     self.state.movement = [False, False]
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
@@ -190,6 +137,7 @@ class Game: # Manage game settings
                     self.state.movement[1] = False
 
     def render(self):
+        # Handle transition effect
         if self.state.transition:
             transition_surf = pygame.Surface(self.display.get_size())
             pygame.draw.circle(transition_surf, 
@@ -200,12 +148,18 @@ class Game: # Manage game settings
             transition_surf.set_colorkey((255, 255, 255))
             self.display.blit(transition_surf, (0, 0))
 
+        # Blit display over background
         self.display_2.blit(self.display, (0, 0))
 
+        # Screenshake
         screenshake_offset = (random.random() * self.screenshake - self.screenshake / 2, random.random() * self.screenshake - self.screenshake / 2)
+
+        # Put all displays onto the screen
         self.screen.blit(pygame.transform.scale(self.display_2, self.screen.get_size()), screenshake_offset) # Where the resizing happens for the pixel art
-        if self.is_paused:
-            self.pause_state.render_pause()
+        
+        # Render pause menu
+        if self.pause_state.is_paused:
+            self.pause_state.render()
 
     def run(self):
         # Play the background music
@@ -218,7 +172,8 @@ class Game: # Manage game settings
         # Game Loop
         while True:
 
-            if self.is_paused:
+            if self.pause_state.is_paused:
+                self.pause_state.update()
                 self.pause_state.handle_input()
             else:
                 self.update()

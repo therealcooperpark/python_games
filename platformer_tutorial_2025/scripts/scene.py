@@ -1,6 +1,7 @@
 import math
 import os
 import pygame
+import random
 from scripts.clouds import Cloud, Clouds
 from scripts.entities import Enemy
 from scripts.particle import Particle
@@ -88,6 +89,11 @@ class GameplayScene(Scene):
         # Background assets
         self.clouds.update()
 
+        for rect in self.leaf_spawners:
+            if random.random() * 49999 < rect.width * rect.height: # Control spawn rate in relation to the size of the tree
+                pos = (rect.x + random.random() * rect.width, rect.y + random.random() * rect.height)
+                self.particles.append(Particle(self.game, 'leaf', pos, velocity=[-0.1, 0.3], frame=random.randint(0, 20)))
+
         # Check for progression to next level
         if len(self.enemies) == 0: # All enemies defeated, unlock next room
             self.complete = True
@@ -107,7 +113,13 @@ class GameplayScene(Scene):
                 self.enemies.remove(enemy)
 
         # Check Player death
-        if not self.dead:
+        if self.dead: # You died, start over in 40 frames
+            self.dead += 1
+            if self.dead >= 10:
+                self.transition = min(30, self.state.transition + 1)
+            if self.dead > 40:
+                self.load_level(self.state.level)
+        else: # Update as usual and continue
             self.game.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
 
         # Resolve sparks
@@ -169,6 +181,10 @@ class PauseScene(Scene):
     def __init__(self, game):
         super().__init__(game)
         self.pause_display = pygame.Surface((self.game.screen.get_width() // 4, self.game.screen.get_height() // 4)) # Set pause space
+        self.is_paused = False
+
+    def update(self):
+        pass # To be used for any updates later
 
     def handle_input(self):
         for event in pygame.event.get(): # event is where the... events get stored
@@ -177,11 +193,13 @@ class PauseScene(Scene):
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        self.game.is_paused = not self.game.is_paused
+                        self.pause()
 
-    def render_pause(self):
+    def render(self):
         # TODO: This is centered correctly, but I need a proper pause screen...
         pygame.draw.circle(self.pause_display, (255, 255, 255), (self.pause_display.get_width() // 2, self.pause_display.get_height() // 2), self.pause_display.get_width() // 3)
         self.game.screen.blit(self.pause_display, (self.game.screen.get_width() // 2 - self.pause_display.get_width() // 2, self.game.screen.get_height() // 2 - self.pause_display.get_height() // 2))
 
+    def pause(self):
+        self.is_paused = not self.is_paused
 
