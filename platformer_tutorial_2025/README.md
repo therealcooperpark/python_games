@@ -18,8 +18,8 @@ Run `poetry run pyinstaller game.py --noconsole` to compile the game for sharing
     - Add damage to dash and projectiles
 
 2. Refactor Game vs Scene logic to improve separation of logic.
-    - Render should check its own transition and the Scene will alter it with its own update
-        - This sets us up for #3 where the transition affect can be triggered by different settings (death, touching transitioner, etc.)
+    - Added Scene and moved majority of level-specific game logic there
+    - Game object now handles high-level logic and Scene can alter between levels
 
 3. Make map transition system
     - Start with travelling to a location after all enemies are dead to move on
