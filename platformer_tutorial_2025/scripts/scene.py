@@ -82,14 +82,20 @@ class GameplayScene(Scene):
         # Reset values
         self.game.player.health = self.game.player.max_health
         self.dead = 0 # Number boolean for if player is dead
-        self.complete = False
+        self.complete = False # Are all enemies dead?
+        self.transitioning = False # Did player reach a Transition point?
         self.transition = -30 # Transition speed when moving to a new level
         self.game.scroll = [0, 0] # Offset which emulates a "camera" experience
 
     def update(self):
-        # Finish load level animation
-        if self.transition < 0:
+        # Track load level animation
+        if self.transition < 0: # For the start of a level
             self.transition += 1
+        if self.complete and self.transitioning: # Track contact with transitioner
+            self.transition += 1
+        if self.transition > 30: # Trigger the new level load
+                    self.level = min(self.level + 1, len(os.listdir('data/maps')) - 1)
+                    self.load_level(self.level)
 
         # Background assets
         self.clouds.update()
@@ -102,13 +108,9 @@ class GameplayScene(Scene):
         # Check for progression to next level
         if len(self.enemies) == 0: # All enemies defeated, unlock next room
             self.complete = True
-
             if self.game.player.rect().collidelistall(self.transitioners): # Start the countdown to new level
-                self.transition += 1
+                self.transitioning = True
 
-                if self.transition > 30: # Trigger the new level load, only when standing on transitioner
-                    self.level = min(self.level + 1, len(os.listdir('data/maps')) - 1)
-                    self.load_level(self.level)
 
         # Handle enemies
         for enemy in self.enemies.copy():
