@@ -7,7 +7,7 @@ import pygame
 class Transitioner:
     def __init__ (self, game, pos, size, load_level):
         self.game = game
-        self.img = self.game.assets['transitioner'].copy().fill((127, 0, 255)) # Grey out
+        self.img = self.game.assets['transitioner'].copy().fill((127, 0, 255)) # Purple out
         self.pos = pos # Tuple of X/Y position
         self.size = size # Tuple of Width/Height
         self.load_level = load_level

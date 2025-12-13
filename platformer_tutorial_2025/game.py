@@ -2,13 +2,11 @@ import pygame
 import math
 import os
 import random
-#from scripts.clouds import Cloud, Clouds
 from scripts.entities import Enemy, PhysicsEntity, Player
 from scripts.particle import Particle
 from scripts.scene import Scene, GameplayScene, PauseScene
 from scripts.spark import Spark
 from scripts.utils import load_image, load_images, Animation
-#from scripts.tilemap import Tilemap
 import sys
 
 class Game: # Manage game settings
@@ -62,7 +60,6 @@ class Game: # Manage game settings
 
         self.state = GameplayScene(self, 0)
         self.pause_state = PauseScene(self)
-        self.is_paused = False
         self.screenshake = 0
         
         self.player = Player(self, (50, 50), (8, 15), health=30)
@@ -82,23 +79,10 @@ class Game: # Manage game settings
         # Update Screenshake
         self.screenshake = max(0, self.screenshake - 1)
 
-        # if self.state.dead: # You died, start over in 40 frames
-        #     self.state.dead += 1
-        #     if self.state.dead >= 10:
-        #         self.state.transition = min(30, self.state.transition + 1)
-        #     if self.state.dead > 40:
-        #         self.state.load_level(self.state.level)
-
-
         # Calculate camera position and offset for future object placement
         self.scroll[0] += (self.player.rect().centerx - self.display.get_width() / 2 - self.scroll[0]) / 30 # The camera position is the top-left. So we need to subtract the screen size to center the player
         self.scroll[1] += (self.player.rect().centery - self.display.get_height() / 2 - self.scroll[1]) / 30 # The camera position is the top-left. So we need to subtract the screen size to center the player
         render_scroll = (int(self.scroll[0]), int(self.scroll[1])) # Solves sub-pixel camera jittering by using int rounding/truncation
-
-        # for rect in self.state.leaf_spawners:
-        #     if random.random() * 49999 < rect.width * rect.height: # Control spawn rate in relation to the size of the tree
-        #         pos = (rect.x + random.random() * rect.width, rect.y + random.random() * rect.height)
-        #         self.state.particles.append(Particle(self, 'leaf', pos, velocity=[-0.1, 0.3], frame=random.randint(0, 20)))
 
         self.state.update()
         self.state.render(render_scroll)

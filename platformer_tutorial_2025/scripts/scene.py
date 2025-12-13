@@ -67,7 +67,7 @@ class GameplayScene(Scene):
                 # Load transition location
                 self.transition_loc = pygame.Rect(spawner['pos'][0], spawner['pos'][1], 8, 15)
             else:
-                self.enemies.append(Enemy(self.game, spawner['pos'], (8, 15), 0, 10))
+                self.enemies.append(Enemy(self.game, spawner['pos'], (8, 15), 10, 10))
         
         # Reset other entity collections
         self.projectiles = []
@@ -97,7 +97,6 @@ class GameplayScene(Scene):
         # Check for progression to next level
         if len(self.enemies) == 0: # All enemies defeated, unlock next room
             self.complete = True
-            print(f'Player: {self.game.player.rect()}\nTransitioner: {self.transition_loc}')
 
             if self.game.player.rect().colliderect(self.transition_loc): # Start the countdown to new level
                 self.transition += 1
@@ -150,8 +149,9 @@ class GameplayScene(Scene):
 
         # Special conditions
         if self.complete:
-            asset = self.game.assets['spawners'][0].fill((127, 0, 255))
-            self.game.display.blit(self.game.assets['spawners'][0],
+            asset = self.game.assets['spawners'][0].copy()
+            asset.fill((127, 0, 255))
+            self.game.display.blit(asset,
                 (self.transition_loc[0] - offset[0],
                  self.transition_loc[1] - offset[1])  
             )
