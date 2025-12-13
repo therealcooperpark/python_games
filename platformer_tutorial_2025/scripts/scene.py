@@ -94,8 +94,8 @@ class GameplayScene(Scene):
         if self.complete and self.transitioning: # Track contact with transitioner
             self.transition += 1
         if self.transition > 30: # Trigger the new level load
-                    self.level = min(self.level + 1, len(os.listdir('data/maps')) - 1)
-                    self.load_level(self.level)
+                self.level = min(self.level + 1, len(os.listdir('data/maps')) - 1)
+                self.load_level(self.level)
 
         # Background assets
         self.clouds.update()
@@ -108,7 +108,7 @@ class GameplayScene(Scene):
         # Check for progression to next level
         if len(self.enemies) == 0: # All enemies defeated, unlock next room
             self.complete = True
-            if self.game.player.rect().collidelistall(self.transitioners): # Start the countdown to new level
+            if self.game.player.rect().collidelistall([x.rect() for x in self.transitioners]): # Start the countdown to new level
                 self.transitioning = True
 
 

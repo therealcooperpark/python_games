@@ -3,7 +3,7 @@ A game level editor leveraging many of the same resources that are called in gam
 '''
 
 import pygame
-from scripts.utils import load_image, load_images
+from scripts.utils import load_images
 from scripts.tilemap import Tilemap
 import sys
 
