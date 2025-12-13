@@ -16,11 +16,11 @@ class Projectile():
         self.pos[0] += self.direction
         self.timer += 1
 
-    def update(self):
+    def update(self, tilemap):
         '''
         Handle collision logic and apply damage where appropriate
         '''
-        if self.game.tilemap.solid_check(self.pos): # Remove on collision with physics tile
+        if tilemap.solid_check(self.pos): # Remove on collision with physics tile
             self.game.state.projectiles.remove(self)
             for i in range(4):
                 self.game.state.sparks.append(Spark(self.pos, random.random() - 0.5 + (math.pi if self.direction > 0 else 0), 2 + random.random()))

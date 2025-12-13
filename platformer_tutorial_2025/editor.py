@@ -26,6 +26,7 @@ class Editor: # Manage game settings
             'large_decor' : load_images('tiles/large_decor'),
             'stone' : load_images('tiles/stone'),
             'spawners': load_images('tiles/spawners'),
+            'transitioner': load_images('tiles/transitioner')
         }
 
         self.movement = [False, False, False, False] # Used to track movement of camera

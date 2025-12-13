@@ -167,6 +167,7 @@ class Player(PhysicsEntity):
         super().__init__(game, 'player', pos, size)
         
         # Stats
+        self.max_health = health
         self.health = health
         self.damage = damage
         
