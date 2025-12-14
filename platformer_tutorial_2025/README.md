@@ -64,10 +64,13 @@ Run `poetry run pyinstaller game.py --noconsole` to compile the game for sharing
     - Talent or Powerup system?
     - Damage number pop-ups on damaged entities?
     - Map Editor improvements
-        - Grouping
-            - Moving grouped blocks
-            - Copy / Paste
-            - Fill blank space within group
-        - Scroll w/ increasing speed
-        - Zoom in/out
-        - Undo
+        - Refactor code to use [Tiled](https://thorbjorn.itch.io/tiled) as an editor instead
+            - Need to import using [pytmx](https://github.com/bitcraft/pytmx)
+        - OR do a lot of this:
+            - Grouping
+                - Moving grouped blocks
+                - Copy / Paste
+                - Fill blank space within group
+            - Scroll w/ increasing speed
+            - Zoom in/out
+            - Undo
