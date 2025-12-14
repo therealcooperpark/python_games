@@ -25,10 +25,9 @@ Run `poetry run pyinstaller game.py --noconsole` to compile the game for sharing
     - Added Transitioner Class to handle special tiles
     - Added support for multiple locations
 
-4. Improve maps
-    - *COMPLETE* Use the level editor to build larger map with more complexity
+4. :white_check_mark: Improve maps
+    - Use the level editor to build larger map with more complexity
     - Make a "Boss Room" level for future use
-    - Consider updating the level editor
 
 5. Make a "Special Attack" for Player
     - Re-use Projectile Class
@@ -52,3 +51,11 @@ Run `poetry run pyinstaller game.py --noconsole` to compile the game for sharing
     - New Enemy w/ Asset
     - Talent or Powerup system?
     - Damage number pop-ups on damaged entities?
+    - Map Editor improvements
+        - Grouping
+            - Moving grouped blocks
+            - Copy / Paste
+            - Fill blank space within group
+        - Scroll w/ increasing speed
+        - Zoom in/out
+        - Undo
