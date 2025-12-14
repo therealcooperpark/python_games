@@ -17,7 +17,7 @@ class Game: # Manage game settings
         pygame.display.set_caption('Ninja Game') # Set window name
         self.screen = pygame.display.set_mode((640, 480)) # Creating the window for the game
         self.display = pygame.Surface((320, 240), pygame.SRCALPHA) # What I render to. We scale this up to the window size later to multiply the size of all our assets
-        self.display_2 = pygame.Surface((320, 240)) # For content that should have outline
+        self.display_2 = pygame.Surface((320, 240)) # For content that should NOT have outline (e.g., Background assets)
 
         self.clock = pygame.time.Clock() # Used to force the game to run at X FPS
 
@@ -75,7 +75,9 @@ class Game: # Manage game settings
 
         # Add basic background fill and asset
         self.display.fill((0, 0, 0, 0))
-        self.display_2.blit(self.assets['background'], (0, 0)) # Default screen background
+        self.display_2.fill((93, 93, 93, 0))
+        if self.state.level != 0:
+            self.display_2.blit(self.assets['background'], (0, 0)) # Default screen background
 
         # Update Screenshake
         self.screenshake = max(0, self.screenshake - 1)

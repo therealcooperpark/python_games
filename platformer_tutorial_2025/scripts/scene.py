@@ -38,7 +38,8 @@ class GameplayScene(Scene):
         self.complete = False
 
         # Map stuff
-        self.clouds = Clouds(self.game.assets['clouds'], count=16)
+        self.cloud_count = 0 if self.level == 0 else 16
+        self.clouds = Clouds(self.game.assets['clouds'], count=self.cloud_count)
         self.tilemap = Tilemap(self.game, tile_size=16)
 
         # Level stuff

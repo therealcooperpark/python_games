@@ -26,7 +26,7 @@ Run `poetry run pyinstaller game.py --noconsole` to compile the game for sharing
     - Added support for multiple locations
 
 4. Improve maps
-    - Use the level editor to build larger map with more complexity
+    - *COMPLETE* Use the level editor to build larger map with more complexity
     - Make a "Boss Room" level for future use
     - Consider updating the level editor
 
@@ -43,6 +43,7 @@ Run `poetry run pyinstaller game.py --noconsole` to compile the game for sharing
 
 8. Consider miscellaneous improvements
     - New jump audio
+    - Moving platforms
     - Proper pause menu with:
         - Reset Fight
         - Quit

@@ -2,6 +2,8 @@
 A game level editor leveraging many of the same resources that are called in game.py
 '''
 
+import argparse
+
 import pygame
 from scripts.utils import load_images
 from scripts.tilemap import Tilemap
@@ -11,7 +13,7 @@ RENDER_SCALE = 2.0
 
 
 class Editor: # Manage game settings
-    def __init__(self):
+    def __init__(self, map_file):
         pygame.init() # Turn the game on?
 
         pygame.display.set_caption('Editor') # Set window name
@@ -32,10 +34,11 @@ class Editor: # Manage game settings
         self.movement = [False, False, False, False] # Used to track movement of camera
 
         self.tilemap = Tilemap(self, tile_size=16)
+        self.map = map_file
         try:
-            self.tilemap.load('map.json') # Load beginning file
+            self.tilemap.load(map_file) # Load beginning file
         except FileNotFoundError:
-            pass
+            print(f'{map_file} Not Found! Opening blank map')
 
         self.scroll = [0, 0] # The offset which simulates the concept of a "camera" (i.e., moving everything X and Y distance)
 
@@ -129,7 +132,7 @@ class Editor: # Manage game settings
                     if event.key == pygame.K_g: # Toggle on grid snapping
                         self.ongrid = not self.ongrid
                     if event.key == pygame.K_o:
-                        self.tilemap.save('map.json')
+                        self.tilemap.save(self.map)
                     if event.key == pygame.K_t:
                         self.tilemap.autotile()
                     if event.key == pygame.K_LSHIFT:
@@ -150,4 +153,11 @@ class Editor: # Manage game settings
             pygame.display.update() # Updates the display
             self.clock.tick(60) # Limits the game to 60 FPS
 
-Editor().run()
+
+# Parse argument for chosen map to edit
+parser = argparse.ArgumentParser(description='Level editor for the platformer game')
+parser.add_argument('map_file', type=str, nargs='?', default='map.json', help='Path to the map file to edit')
+args = parser.parse_args()
+
+editor = Editor(args.map_file)
+editor.run()
