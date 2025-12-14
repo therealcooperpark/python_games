@@ -4,13 +4,16 @@ from scripts.spark import Spark
 import random
 
 class Projectile():
-    def __init__(self, game, pos, direction, timer, damage=0):
+    def __init__(self, game, pos, direction, timer, damage=0, img=None):
         self.game = game
         self.pos = pos
         self.direction = direction
         self.timer = timer
         self.damage = damage
-        self.img = game.assets['projectile']
+        if img:
+            self.img = img
+        else:
+            self.img = game.assets['projectile']
 
     def move(self):
         self.pos[0] += self.direction

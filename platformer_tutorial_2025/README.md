@@ -30,9 +30,21 @@ Run `poetry run pyinstaller game.py --noconsole` to compile the game for sharing
     - Make a "Boss Room" level for future use
 
 5. Make a "Special Attack" for Player
-    - Re-use Projectile Class
-    - Earn on X kills
-    - Add a UI element to show it's progress
+    - **Goals:**
+        - Re-use Projectile Class
+        - Earn on X kills
+        - Add a UI element to show it's progress
+    
+    - **Implementation Steps**
+        - Make inherited Projectile class intended for special attack
+            - Maybe make Projectile super generic and then build enemy projectiles into their own
+        - Add a button press for special attack
+        - Add "charge" meter to enable the attack
+            - Lock attack behind the charge
+            - Enemy kill needs to add 1 to the charge
+        - Add UI to show meter charge
+            - Need new layer that goes on top of *everything* but is transparent I think?
+            - UI render pulls from special attack charge
 
 6. Make a couple assets to fill out the game
     - Special Attack Projectile
