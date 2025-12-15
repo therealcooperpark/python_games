@@ -1,7 +1,7 @@
 import math
 import pygame
 from scripts.particle import Particle
-from scripts.projectile import EnemyProjectile, Projectile
+from scripts.projectile import EnemyProjectile, PlayerShuriken, Projectile
 from scripts.spark import Spark
 import random
 
@@ -123,7 +123,7 @@ class Enemy(PhysicsEntity):
         else:
             self.set_action('idle')
 
-        # Process any attack received
+        # Process any dash attack received
         self.iframes = max(0, self.iframes - 1)
         if abs(self.game.player.dashing) >= 50:
             if self.rect().colliderect(self.game.player.rect()) and self.iframes == 0: # If enemy collides with rect of dashing player and isn't immune
@@ -175,6 +175,7 @@ class Player(PhysicsEntity):
         self.i_window = i_window # How many frames of invincibility granted on hit
         self.iframes = 0 # How many frames of invincibility left
         self.dashing = 0 # How many frames left to dash
+        self.kills = 0 # Track kills so we can store energy for shuriken
 
         # Movement
         self.air_time = 0
@@ -281,3 +282,16 @@ class Player(PhysicsEntity):
                 self.dashing = -60
             else:
                 self.dashing = 60
+
+    def shuriken(self):
+        if self.kills >= 0:
+            self.kills = 0 # Reset for next charge
+            flipped = 1 if self.flip else -1
+            self.game.state.projectiles.append(PlayerShuriken(
+                self.game, 
+                [self.rect().centerx - 7 * flipped, self.rect().centery], 
+                -3 * flipped, 
+                0, 
+                self.damage * 2
+            ))
+            self.game.sfx['shoot'].play()

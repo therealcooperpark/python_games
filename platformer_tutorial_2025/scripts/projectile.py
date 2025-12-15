@@ -1,4 +1,5 @@
 import math
+import pygame
 from scripts.particle import Particle
 from scripts.spark import Spark
 import random
@@ -15,6 +16,9 @@ class Projectile():
         else:
             self.img = game.assets['projectile']
 
+    def rect(self):
+        return pygame.Rect(self.pos[0], self.pos[1], self.img.get_width(), self.img.get_height())
+
     def update(self, tilemap):
         self.pos[0] += self.direction
         self.timer += 1
@@ -25,22 +29,29 @@ class Projectile():
                    self.pos[1] - self.img.get_height() / 2 - offset[1])
         )
 
+    def _destroy_projectile(self, sparks=False):
+        '''
+        Destroys projectile and queues some Sparks if necessary
+        '''
+        self.game.state.projectiles.remove(self)
+        if sparks:
+            for i in range(4):
+                self.game.state.sparks.append(Spark(self.pos, random.random() - 0.5 + (math.pi if self.direction > 0 else 0), 2 + random.random()))
+
 class EnemyProjectile(Projectile):
     def __init__(self, game, pos, direction, timer, damage=0, img=None):
         super().__init__(game, pos, direction, timer, damage, img)
 
     def update(self, tilemap):
         '''
-        Handle collision logic and apply damage where appropriate
+        Handle collision logic and apply damage to player where appropriate
         '''
         super().update(tilemap)
         
         if tilemap.solid_check(self.pos): # Remove on collision with physics tile
-            self.game.state.projectiles.remove(self)
-            for i in range(4):
-                self.game.state.sparks.append(Spark(self.pos, random.random() - 0.5 + (math.pi if self.direction > 0 else 0), 2 + random.random()))
+            super()._destroy_projectile(sparks=True)
         elif self.timer > 360: # Time out the projectile
-            self.game.state.projectiles.remove(self)
+            super()._destroy_projectile(sparks=False)
         elif abs(self.game.player.dashing) < 50 and self.game.player.iframes == 0:
             if self.game.player.rect().collidepoint(self.pos):
                 self.game.state.projectiles.remove(self)
@@ -61,3 +72,45 @@ class EnemyProjectile(Projectile):
 
     def render(self, surf, offset=(0, 0)):
         super().render(surf, offset)
+
+
+class PlayerShuriken(Projectile):
+    def __init__(self, game, pos, direction, timer, damage=0, img=None):
+        super().__init__(game, pos, direction, timer, damage, img)
+
+    def update(self, tilemap):
+        '''
+        Handle collision logic and apply damage to enemies where appropriate
+        '''
+        super().update(tilemap)
+
+        enemy_hit = super().rect().collideobjectsall(self.game.state.enemies, key=lambda e: e.rect())
+
+        if tilemap.solid_check(self.pos): # Remove on collision with physics tile
+            super()._destroy_projectile(sparks=True)
+        elif self.timer > 360: # Time out the projectile
+            super()._destroy_projectile(sparks=False)
+        elif len(enemy_hit) > 0: # Enemy hit by projectile
+            # super()._destroy_projectile(sparks=False) # I want piercing damage
+            enemy_hit = enemy_hit[0]
+            self.game.sfx['hit'].play()
+            alive = enemy_hit.take_damage(self.damage)
+            if alive:
+                print(f'ENEMY HIT!\nDamage taken: {self.damage}\nRemaining health: {enemy_hit.health}')
+                enemy_hit.iframes += enemy_hit.i_window
+                for i in range(30):
+                    angle = random.random() * math.pi * 2
+                    speed = random.random() * 5
+                    self.game.state.sparks.append(Spark(self.rect().center, angle, 2 + random.random()))
+                    self.game.state.particles.append(Particle(self.game, 'particle', self.rect().center, velocity=[math.cos(angle + math.pi) * speed * 0.5, math.sin(angle + math.pi) * speed * 0.5], frame=random.randint(0, 7)))
+            else:
+                for i in range(30):
+                    angle = random.random() * math.pi * 2
+                    speed = random.random() * 5
+                    self.game.state.sparks.append(Spark(self.rect().center, angle, 2 + random.random()))
+                    self.game.state.particles.append(Particle(self.game, 'particle', self.rect().center, velocity=[math.cos(angle + math.pi) * speed * 0.5, math.sin(angle + math.pi) * speed * 0.5], frame=random.randint(0, 7)))
+                print('ENEMY KILLED!')
+                self.game.state.sparks.append(Spark(self.rect().center, 0, 5 + random.random()))
+                self.game.state.sparks.append(Spark(self.rect().center, math.pi, 5 + random.random()))
+                self.game.state.enemies.remove(enemy_hit)
+

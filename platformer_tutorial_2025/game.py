@@ -112,6 +112,8 @@ class Game: # Manage game settings
                 if event.key == pygame.K_UP:
                     if self.player.jump():
                         self.sfx['jump'].play()
+                if event.key == pygame.K_c:
+                    self.player.shuriken()
                 if event.key == pygame.K_x:
                     self.player.dash()
                 if event.key == pygame.K_ESCAPE:
