@@ -137,7 +137,6 @@ class GameplayScene(Scene):
         
         # Resolve Projectiles
         for projectile in self.projectiles.copy():
-            projectile.move() # TODO: Consider putting move in update
             projectile.update(self.tilemap)
 
         # Resolve Particles

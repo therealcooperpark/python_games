@@ -1,7 +1,7 @@
 import math
 import pygame
 from scripts.particle import Particle
-from scripts.projectile import Projectile
+from scripts.projectile import EnemyProjectile, Projectile
 from scripts.spark import Spark
 import random
 
@@ -105,12 +105,12 @@ class Enemy(PhysicsEntity):
                 if (abs(dis[1]) < 16):
                     if (self.flip and dis[0] < 0): # Enemy must be facing player
                         self.game.sfx['shoot'].play()
-                        self.game.state.projectiles.append(Projectile(self.game, [self.rect().centerx - 7, self.rect().centery], -1.5, 0, self.damage))
+                        self.game.state.projectiles.append(EnemyProjectile(self.game, [self.rect().centerx - 7, self.rect().centery], -1.5, 0, self.damage))
                         for i in range(4):
                             self.game.state.sparks.append(Spark(self.game.state.projectiles[-1].pos, random.random() - 0.5 + math.pi, 2 + random.random()))
                     if (not self.flip and dis[0] > 0):
                         self.game.sfx['shoot'].play()
-                        self.game.state.projectiles.append(Projectile(self.game, [self.rect().centerx + 7, self.rect().centery], 1.5, 0, self.damage))
+                        self.game.state.projectiles.append(EnemyProjectile(self.game, [self.rect().centerx + 7, self.rect().centery], 1.5, 0, self.damage))
                         for i in range(4):
                             self.game.state.sparks.append(Spark(self.game.state.projectiles[-1].pos, random.random() - 0.5, 2 + random.random()))
         elif random.random() < 0.01: # Start walking on a semi-random cadence if not already walking

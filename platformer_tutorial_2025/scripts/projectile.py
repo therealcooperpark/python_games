@@ -15,14 +15,26 @@ class Projectile():
         else:
             self.img = game.assets['projectile']
 
-    def move(self):
+    def update(self, tilemap):
         self.pos[0] += self.direction
         self.timer += 1
+
+    def render(self, surf, offset=(0, 0)):
+        surf.blit(self.img, 
+                  (self.pos[0] - self.img.get_width() / 2 - offset[0], 
+                   self.pos[1] - self.img.get_height() / 2 - offset[1])
+        )
+
+class EnemyProjectile(Projectile):
+    def __init__(self, game, pos, direction, timer, damage=0, img=None):
+        super().__init__(game, pos, direction, timer, damage, img)
 
     def update(self, tilemap):
         '''
         Handle collision logic and apply damage where appropriate
         '''
+        super().update(tilemap)
+        
         if tilemap.solid_check(self.pos): # Remove on collision with physics tile
             self.game.state.projectiles.remove(self)
             for i in range(4):
@@ -48,7 +60,4 @@ class Projectile():
                     print('PLAYER KILLED!')
 
     def render(self, surf, offset=(0, 0)):
-        surf.blit(self.img, 
-                  (self.pos[0] - self.img.get_width() / 2 - offset[0], 
-                   self.pos[1] - self.img.get_height() / 2 - offset[1])
-        )
+        super().render(surf, offset)
