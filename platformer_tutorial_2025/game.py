@@ -42,6 +42,7 @@ class Game: # Manage game settings
             'particle/particle': Animation(load_images('particles/particle'), img_dur=6, loop=False),
             'gun': load_image('gun.png'),
             'projectile': load_image('projectile.png'),
+            'shuriken': load_image('shuriken.png', resize=True)
         }
 
         # Setting sound affects

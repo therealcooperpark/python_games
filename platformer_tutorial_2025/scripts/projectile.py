@@ -76,13 +76,19 @@ class EnemyProjectile(Projectile):
 
 class PlayerShuriken(Projectile):
     def __init__(self, game, pos, direction, timer, damage=0, img=None):
-        super().__init__(game, pos, direction, timer, damage, img)
+        super().__init__(game, pos, direction, timer, damage, img=game.assets['shuriken'])
+
+        self.rotation_angle = 0 # Rotation of the img
+        self.rotation_rate = 5 if self.direction < 1 else -5 # Rate of the rotation changing per frame
 
     def update(self, tilemap):
         '''
         Handle collision logic and apply damage to enemies where appropriate
         '''
         super().update(tilemap)
+
+        # Rotate img for rendering
+        self.rotation_angle += self.rotation_rate
 
         enemy_hit = super().rect().collideobjectsall(self.game.state.enemies, key=lambda e: e.rect())
 
@@ -113,4 +119,10 @@ class PlayerShuriken(Projectile):
                 self.game.state.sparks.append(Spark(self.rect().center, 0, 5 + random.random()))
                 self.game.state.sparks.append(Spark(self.rect().center, math.pi, 5 + random.random()))
                 self.game.state.enemies.remove(enemy_hit)
+
+    def render(self, surf, offset=(0, 0)):
+        rotated_img = pygame.transform.rotozoom(self.img, self.rotation_angle, 1.0)
+        rotated_rect = rotated_img.get_rect(center=(self.pos[0] - offset[0],
+                                                    self.pos[1] - offset[1]))
+        surf.blit(rotated_img, rotated_rect)
 
