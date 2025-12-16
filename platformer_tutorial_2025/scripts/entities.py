@@ -176,11 +176,20 @@ class Player(PhysicsEntity):
         self.iframes = 0 # How many frames of invincibility left
         self.dashing = 0 # How many frames left to dash
         self.kills = 0 # Track kills so we can store energy for shuriken
+        self.shuriken_charge = 5 # Tracks # of kills required for shuriken
 
         # Movement
         self.air_time = 0
         self.jumps = 1
         self.wall_slide = False
+
+        # Special rendering support
+        self.special_pos_x = self.game.screen.get_width() * 0.9
+        self.special_pos_y = self.game.screen.get_height() * 0.9
+        self.special_size_x = (self.game.screen.get_width() * 0.99) - self.special_pos_x
+        self.special_size_y = (self.game.screen.get_height() * 0.99) - self.special_pos_y
+        self.special_rect = pygame.Rect(self.special_pos_x, self.special_pos_y, self.special_size_x, self.special_size_y)
+        self.radius = self.special_size_x // 2 - 10
 
     def update(self, tilemap, movement=(0, 0)):
         super().update(tilemap, movement=movement)
@@ -246,14 +255,51 @@ class Player(PhysicsEntity):
         else:
             self.velocity[0] = min(self.velocity[0] + 0.1, 0)
 
-    def take_damage(self, damage):
-        self.health -= damage
-        return True if self.health > 0 else False
-
     def render(self, surf, offset=(0, 0)):
+        # Render character
         if abs(self.dashing) <= 50:
             super().render(surf, offset=offset)
 
+        # Update Shuriken graphic
+            # Draw box
+        pygame.draw.rect(self.game.ui_display, (0, 0, 0), self.special_rect) # Box
+        pygame.draw.rect(self.game.ui_display, (100, 100, 100), self.special_rect, 2) # Outline
+        
+            # Add icon
+        icon = self.game.assets['shuriken'].copy()
+        icon_pos_x = self.special_pos_x + (self.special_size_x // 2) - icon.get_width() // 2
+        icon_pos_y = self.special_pos_y + (self.special_size_y // 2) - icon.get_height() // 2
+        self.game.ui_display.blit(icon, (icon_pos_x, icon_pos_y))
+
+            # Calculate fill circle and apply
+        fill_ratio = min(self.kills / self.shuriken_charge, 1)
+        if fill_ratio > 0:
+            # Create surface w/ alpha for the circle
+            fill_circle = pygame.Surface((self.special_size_x, self.special_size_y), pygame.SRCALPHA)
+
+            # Calculate angle for filled ratio
+            fill_angle = fill_ratio * 360
+
+            # Draw filled segment
+            center = (self.special_size_x // 2, self.special_size_y // 2)
+
+            if fill_ratio >= 1.0:
+                # Draw full circle
+                pygame.draw.circle(fill_circle, (255, 255, 255, 100), center, self.radius)
+            else:
+                points = [center]
+                num_points = max(int(fill_angle / 5), 2)
+
+                for i in range(num_points + 1):
+                    angle = math.radians(-90 + (i * fill_angle / num_points))
+                    x = center[0] + self.radius * math.cos(angle)
+                    y = center[1] + self.radius * math.sin(angle)
+                    points.append((x, y))
+                
+                if len(points) > 2:
+                    pygame.draw.polygon(fill_circle, (255, 255, 255, 100), points)
+
+            self.game.ui_display.blit(fill_circle, (self.special_pos_x, self.special_pos_y))
 
     def jump(self):
         if self.wall_slide:
@@ -284,7 +330,7 @@ class Player(PhysicsEntity):
                 self.dashing = 60
 
     def shuriken(self):
-        if self.kills >= 0:
+        if self.kills >= self.shuriken_charge:
             self.kills = 0 # Reset for next charge
             flipped = 1 if self.flip else -1
             self.game.state.projectiles.append(PlayerShuriken(
@@ -294,4 +340,16 @@ class Player(PhysicsEntity):
                 0, 
                 self.damage * 2
             ))
-            self.game.sfx['shoot'].play()
+            self.game.sfx['special_attack'].play()
+
+    def take_damage(self, damage):
+        self.health -= damage
+        return True if self.health > 0 else False
+
+    def register_kill(self):
+        '''
+        Add a kill to counter, trigger effects based on kill count
+        '''
+        self.kills += 1
+        if self.kills == self.shuriken_charge:
+            self.game.sfx['special_attack_charged'].play()

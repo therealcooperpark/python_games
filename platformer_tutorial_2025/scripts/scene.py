@@ -117,7 +117,7 @@ class GameplayScene(Scene):
         for enemy in self.enemies.copy():
             kill = enemy.update(self.tilemap, (0, 0))
             if kill:
-                self.game.player.kills += 1
+                self.game.player.register_kill()
                 self.enemies.remove(enemy)
 
         # Check Player death

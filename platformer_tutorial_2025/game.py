@@ -18,6 +18,7 @@ class Game: # Manage game settings
         self.screen = pygame.display.set_mode((640, 480)) # Creating the window for the game
         self.display = pygame.Surface((320, 240), pygame.SRCALPHA) # What I render to. We scale this up to the window size later to multiply the size of all our assets
         self.display_2 = pygame.Surface((320, 240)) # For content that should NOT have outline (e.g., Background assets)
+        self.ui_display = pygame.Surface((640, 480), pygame.SRCALPHA) # For UI elements that are static on screen
 
         self.clock = pygame.time.Clock() # Used to force the game to run at X FPS
 
@@ -52,6 +53,8 @@ class Game: # Manage game settings
             'hit': pygame.mixer.Sound('data/sfx/hit.wav'),
             'shoot': pygame.mixer.Sound('data/sfx/shoot.wav'),
             'ambience': pygame.mixer.Sound('data/sfx/ambience.wav'),
+            'special_attack': pygame.mixer.Sound('data/sfx/special_attack.wav'),
+            'special_attack_charged': pygame.mixer.Sound('data/sfx/special_attack_charged.wav')
         }
 
         self.sfx['ambience'].set_volume(0.2)
@@ -79,7 +82,8 @@ class Game: # Manage game settings
         self.display_2.fill((93, 93, 93, 0))
         if self.state.level != 0:
             self.display_2.blit(self.assets['background'], (0, 0)) # Default screen background
-
+        self.ui_display.fill((0, 0, 0, 0))
+        
         # Update Screenshake
         self.screenshake = max(0, self.screenshake - 1)
 
@@ -146,7 +150,10 @@ class Game: # Manage game settings
 
         # Put all displays onto the screen
         self.screen.blit(pygame.transform.scale(self.display_2, self.screen.get_size()), screenshake_offset) # Where the resizing happens for the pixel art
-        
+
+        # Put UI on the screen
+        self.screen.blit(self.ui_display, (0, 0))
+
         # Render pause menu
         if self.pause_state.is_paused:
             self.pause_state.render()

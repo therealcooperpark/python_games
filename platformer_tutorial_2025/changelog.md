@@ -1,3 +1,7 @@
+## 12/15/2025
+- Added Special attack based on kills
+- Added static UI element that tracks progress towards special availability
+
 ## 12/13/2025
 - Refactored game to have Game and Scene objects
 - Added Transition Point instead of auto-level transition
