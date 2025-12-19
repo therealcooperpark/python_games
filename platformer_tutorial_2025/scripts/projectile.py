@@ -39,6 +39,12 @@ class Projectile():
                 self.game.state.sparks.append(Spark(self.pos, random.random() - 0.5 + (math.pi if self.direction > 0 else 0), 2 + random.random()))
 
 class EnemyProjectile(Projectile):
+    """
+    A projectile fired by enemies that can damage the player.
+
+    Unlike the base Projectile class, EnemyProjectile handles collision with the player,
+    applies damage, and manages its own destruction upon hitting the player or a solid tile.
+    """
     def __init__(self, game, pos, direction, timer, damage=0, img=None):
         super().__init__(game, pos, direction, timer, damage, img)
 
