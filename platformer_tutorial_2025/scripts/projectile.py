@@ -75,6 +75,14 @@ class EnemyProjectile(Projectile):
 
 
 class PlayerShuriken(Projectile):
+    """
+    A projectile type representing the player's special shuriken attack.
+
+    Features rotating img (adjusting based on player direction) and piercing damage
+    instead of destruction on first enemy contact.
+    
+    Walls will still break the projectile.
+    """
     def __init__(self, game, pos, direction, timer, damage=0, img=None):
         super().__init__(game, pos, direction, timer, damage, img=game.assets['shuriken'])
 
