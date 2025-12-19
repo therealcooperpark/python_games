@@ -111,7 +111,6 @@ class PlayerShuriken(Projectile):
         elif self.timer > 360: # Time out the projectile
             super()._destroy_projectile(sparks=False)
         elif len(enemy_hit) > 0: # Enemy hit by projectile
-            # super()._destroy_projectile(sparks=False) # I want piercing damage
             enemy_hit = enemy_hit[0]
             self.game.sfx['hit'].play()
             alive = enemy_hit.take_damage(self.damage)

@@ -1,7 +1,7 @@
 import math
 import pygame
 from scripts.particle import Particle
-from scripts.projectile import EnemyProjectile, PlayerShuriken, Projectile
+from scripts.projectile import EnemyProjectile, PlayerShuriken
 from scripts.spark import Spark
 import random
 
@@ -262,26 +262,26 @@ class Player(PhysicsEntity):
 
         # Update Shuriken graphic
         # Draw box
-        pygame.draw.rect(self.game.ui_display, (0, 0, 0), self.special_rect) # Box
-        pygame.draw.rect(self.game.ui_display, (100, 100, 100), self.special_rect, 2) # Outline
+        pygame.draw.rect(self.game.ui_display, (0, 0, 0), self.shuriken_ui_rect) # Box
+        pygame.draw.rect(self.game.ui_display, (100, 100, 100), self.shuriken_ui_rect, 2) # Outline
         
         # Add icon
         icon = self.game.assets['shuriken'].copy()
-        icon_pos_x = self.special_pos_x + (self.special_size_x // 2) - icon.get_width() // 2
-        icon_pos_y = self.special_pos_y + (self.special_size_y // 2) - icon.get_height() // 2
+        icon_pos_x = self.shuriken_ui_pos_x + (self.shuriken_ui_size_x // 2) - icon.get_width() // 2
+        icon_pos_y = self.shuriken_ui_pos_y + (self.shuriken_ui_size_y // 2) - icon.get_height() // 2
         self.game.ui_display.blit(icon, (icon_pos_x, icon_pos_y))
 
         # Calculate fill circle and apply
         fill_ratio = min(self.kills / self.shuriken_charge, 1)
         if fill_ratio > 0:
             # Create surface w/ alpha for the circle
-            fill_circle = pygame.Surface((self.special_size_x, self.special_size_y), pygame.SRCALPHA)
+            fill_circle = pygame.Surface((self.shuriken_ui_size_x, self.shuriken_ui_size_y), pygame.SRCALPHA)
 
             # Calculate angle for filled ratio
             fill_angle = fill_ratio * 360
 
             # Draw filled segment
-            center = (self.special_size_x // 2, self.special_size_y // 2)
+            center = (self.shuriken_ui_size_x // 2, self.shuriken_ui_size_y // 2)
 
             if fill_ratio >= 1.0:
                 # Draw full circle
@@ -299,7 +299,7 @@ class Player(PhysicsEntity):
                 if len(points) > 2:
                     pygame.draw.polygon(fill_circle, (255, 255, 255, 100), points)
 
-            self.game.ui_display.blit(fill_circle, (self.special_pos_x, self.special_pos_y))
+            self.game.ui_display.blit(fill_circle, (self.shuriken_ui_pos_x, self.shuriken_ui_pos_y))
 
     def jump(self):
         if self.wall_slide:
