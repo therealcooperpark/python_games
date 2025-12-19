@@ -261,17 +261,17 @@ class Player(PhysicsEntity):
             super().render(surf, offset=offset)
 
         # Update Shuriken graphic
-            # Draw box
+        # Draw box
         pygame.draw.rect(self.game.ui_display, (0, 0, 0), self.special_rect) # Box
         pygame.draw.rect(self.game.ui_display, (100, 100, 100), self.special_rect, 2) # Outline
         
-            # Add icon
+        # Add icon
         icon = self.game.assets['shuriken'].copy()
         icon_pos_x = self.special_pos_x + (self.special_size_x // 2) - icon.get_width() // 2
         icon_pos_y = self.special_pos_y + (self.special_size_y // 2) - icon.get_height() // 2
         self.game.ui_display.blit(icon, (icon_pos_x, icon_pos_y))
 
-            # Calculate fill circle and apply
+        # Calculate fill circle and apply
         fill_ratio = min(self.kills / self.shuriken_charge, 1)
         if fill_ratio > 0:
             # Create surface w/ alpha for the circle
