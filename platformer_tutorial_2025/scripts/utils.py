@@ -3,9 +3,11 @@ import pygame
 
 BASE_IMG_PATH = 'data/images/'
 
-def load_image(path):
+def load_image(path, resize=False, resize_size=(16, 16)):
     img = pygame.image.load(BASE_IMG_PATH + path).convert() # Convert image for better optimization
     img.set_colorkey((0,0,0)) # Take out black
+    if resize:
+        img = pygame.transform.scale(img, resize_size)
     return img
 
 def load_images(path):
