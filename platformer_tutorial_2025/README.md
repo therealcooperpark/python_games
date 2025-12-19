@@ -29,13 +29,12 @@ Run `poetry run pyinstaller game.py --noconsole` to compile the game for sharing
     - Use the level editor to build larger map with more complexity
     - Make a "Boss Room" level for future use
 
-5. Make a "Special Attack" for Player
-    - Re-use Projectile Class
-    - Earn on X kills
-    - Add a UI element to show it's progress
+5. :white_check_mark: Make a "Special Attack" for Player
+    - Added Special attack based on kills
+    - Added static UI element that tracks progress towards special availability
 
-6. Make a couple assets to fill out the game
-    - Special Attack Projectile
+6. Make (or find) a couple assets to fill out the game
+    - *Complete* Special Attack Projectile
     - "Final" Boss
 
 7. Design the Boss in game
@@ -52,10 +51,13 @@ Run `poetry run pyinstaller game.py --noconsole` to compile the game for sharing
     - Talent or Powerup system?
     - Damage number pop-ups on damaged entities?
     - Map Editor improvements
-        - Grouping
-            - Moving grouped blocks
-            - Copy / Paste
-            - Fill blank space within group
-        - Scroll w/ increasing speed
-        - Zoom in/out
-        - Undo
+        - Refactor code to use [Tiled](https://thorbjorn.itch.io/tiled) as an editor instead
+            - Need to import using [pytmx](https://github.com/bitcraft/pytmx)
+        - OR do a lot of this:
+            - Grouping
+                - Moving grouped blocks
+                - Copy / Paste
+                - Fill blank space within group
+            - Scroll w/ increasing speed
+            - Zoom in/out
+            - Undo
