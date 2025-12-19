@@ -183,13 +183,13 @@ class Player(PhysicsEntity):
         self.jumps = 1
         self.wall_slide = False
 
-        # Special rendering support
-        self.special_pos_x = self.game.screen.get_width() * 0.9
-        self.special_pos_y = self.game.screen.get_height() * 0.9
-        self.special_size_x = (self.game.screen.get_width() * 0.99) - self.special_pos_x
-        self.special_size_y = (self.game.screen.get_height() * 0.99) - self.special_pos_y
-        self.special_rect = pygame.Rect(self.special_pos_x, self.special_pos_y, self.special_size_x, self.special_size_y)
-        self.radius = self.special_size_x // 2 - 10
+        # Shuriken UI rendering support
+        self.shuriken_ui_pos_x = self.game.screen.get_width() * 0.9
+        self.shuriken_ui_pos_y = self.game.screen.get_height() * 0.9
+        self.shuriken_ui_size_x = (self.game.screen.get_width() * 0.99) - self.shuriken_ui_pos_x
+        self.shuriken_ui_size_y = (self.game.screen.get_height() * 0.99) - self.shuriken_ui_pos_y
+        self.shuriken_ui_rect = pygame.Rect(self.shuriken_ui_pos_x, self.shuriken_ui_pos_y, self.shuriken_ui_size_x, self.shuriken_ui_size_y)
+        self.radius = self.shuriken_ui_size_x // 2 - 10
 
     def update(self, tilemap, movement=(0, 0)):
         super().update(tilemap, movement=movement)
